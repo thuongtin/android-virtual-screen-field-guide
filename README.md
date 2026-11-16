@@ -6,6 +6,12 @@ Ghi chép thực nghiệm điều khiển ứng dụng Android trên **màn hìn
 
 **Ngày kiểm chứng: 16/11/2026.** Các phiên bản nêu dưới đây là bản đã thử, không mặc định là bản mới nhất. Kết quả được tác giả tổng hợp từ phiên chạy thật; ảnh và log riêng tư không được công khai. Người đọc cần tự tái lập, không coi các bảng tổng hợp trong repo là raw evidence có thể audit độc lập.
 
+## Pixel 10 Pro XL / Android 17: kết quả mới
+
+Non-root với VirtualScreen + Shizuku shell: đã kiểm MCP semantic click/set-text trên probe khi máy khóa/tắt, qua workaround nguồn riêng cho display. Coordinate tap lúc khóa vẫn FAIL. Khi mở khóa, đã đọc/gửi tin theo yêu cầu trên WhatsApp ở màn hình ảo trong khi TikTok vẫn foreground ở các lần kiểm, rồi trả WhatsApp về nền. Không tự bật Wireless debugging; chưa bảo đảm mọi app hoặc không giành focus thoáng qua.
+
+[Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
+
 ## Kết luận ngắn
 
 1. **Có root chưa chắc chạy được; không root vẫn có thể chạy.** A32 đã root nhưng Root backend của Virtual Screen bị lỗi package/UID. Đổi sang Shizuku chạy bằng ADB, UID `2000(shell)`, thì luồng kiểm tra hoạt động.

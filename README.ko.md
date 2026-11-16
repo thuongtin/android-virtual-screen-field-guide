@@ -9,6 +9,12 @@
 결과는 작성자가 보고하고 비식별 처리한 요약입니다. 비공개 캡처와 원본 로그는 공개하지 않습니다.
 따라서 공개 요약을 독립적으로 감사 가능한 원본 증거로 취급하지 말고 직접 재현해야 합니다.
 
+## Pixel 10 Pro XL / Android 17 업데이트
+
+루트 없이 VirtualScreen + Shizuku shell로 잠금 및 화면 꺼짐 상태의 테스트 페이지에서 시맨틱 클릭과 텍스트 설정을 검증했습니다. 실험적인 개별 디스플레이 전원 재정의가 필요하며, 잠금 상태의 좌표 탭은 여전히 실패했습니다. 잠금 해제 상태에서 사용자 승인에 따라 가상 화면으로 WhatsApp 메시지를 읽고 전송했으며, 표본 확인 시 TikTok은 실제 화면 전경을 유지했습니다. 이후 WhatsApp을 백그라운드로 복원했습니다. 무선 디버깅을 자동으로 켜지 않으며 모든 앱이나 순간적인 포커스 변화 방지를 보장하지 않습니다.
+
+[Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
+
 ## 핵심 결론
 
 - **Root는 필요조건도 충분조건도 아닙니다.** Root가 있는 Samsung A32에서 Virtual Screen의 Root 백엔드는 package/UID 오류로 실패했습니다. ADB로 시작한 shell UID `2000`의 Shizuku 경로는 작동했습니다.

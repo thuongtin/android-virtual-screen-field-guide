@@ -1,5 +1,7 @@
 # Diagnose the failing boundary
 
+> Pixel Android 17 update: see [the dedicated workflow and evidence boundaries](pixel-android17.md), including locked semantic input, parallel use, and the no-auto-wireless policy. Do not apply Xiaomi recovery settings to this Pixel workflow.
+
 [Guide](../README.en.md) · [Reproduction](reproduce.md) · [Observed results](observed-results.md)
 
 | Symptom | What to inspect | What not to conclude |

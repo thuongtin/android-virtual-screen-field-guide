@@ -1,5 +1,7 @@
 # Wireless debugging: auto-off, reconnection and helper recovery
 
+> Pixel Android 17 update: see [the dedicated workflow and evidence boundaries](pixel-android17.md), including locked semantic input, parallel use, and the no-auto-wireless policy. Do not apply Xiaomi recovery settings to this Pixel workflow.
+
 [Guide](../README.en.md) · [Observed results](observed-results.md) · [Troubleshooting](troubleshooting.md)
 
 Research and field observations: **2026-11-16**. Community reports below are reports about their authors' devices, not fixes verified on every Xiaomi or Android version.

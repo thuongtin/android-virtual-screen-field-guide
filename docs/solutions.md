@@ -1,9 +1,11 @@
 # Solutions: separate display, privilege and lifecycle
 
-This guide records two useful paths, not a universal Android compatibility claim:
+This guide records device-specific paths, not a universal Android compatibility claim:
 
 - **VirtualScreen v0.2.1 + Shizuku v13.6.0 started through ADB as shell** worked on the tested Samsung with the physical screen off. The Root backend failed on that same device.
 - **Mika v0.1.44 native shell service** created and controlled a separate display on a non-root Xiaomi while its physical display was off and secure keyguard was showing. That result came from a disposable process loading the installed APK's native helper code, not from Mika's serving-helper RPC or full AI workflow.
+
+- **Pixel 10 Pro XL / Android 17, non-root, VirtualScreen + ADB Shizuku** adds a bounded parallel-use result and conditional locked semantic input. See the [Pixel workflow](pixel-android17.md); locked coordinate input failed and wireless auto-enablement is explicitly excluded.
 
 Versions, primary references and provenance are in [sources.md](sources.md). References here are pinned where the upstream project permits it. No root installation, bootloader change or keyguard dismissal is part of this procedure.
 

@@ -1,5 +1,7 @@
 # Observed results and evidence boundaries
 
+> Pixel Android 17 update: see [the dedicated workflow and evidence boundaries](pixel-android17.md), including locked semantic input, parallel use, and the no-auto-wireless policy. Do not apply Xiaomi recovery settings to this Pixel workflow.
+
 [Guide](../README.en.md) · [Sources](sources.md)
 
 Date: **2026-11-16**. These are author-reported results from real devices. Raw screenshots, credentials, account details and identifying device/network data remain private. This document and [observations.json](../examples/observations.json) are sanitized summaries, not raw logs from which a third party can independently reproduce every assertion.

@@ -1,5 +1,7 @@
 # Reproduce in small, reversible stages
 
+> Pixel Android 17 update: see [the dedicated workflow and evidence boundaries](pixel-android17.md), including locked semantic input, parallel use, and the no-auto-wireless policy. Do not apply Xiaomi recovery settings to this Pixel workflow.
+
 [Guide](../README.en.md) · [Solutions](solutions.md) · [Failure diagnosis](troubleshooting.md)
 
 Use a device and account you are authorized to control. This checklist is deliberately staged: do not replace a failed runtime test with a source-code observation or a successful install.

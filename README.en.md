@@ -6,6 +6,12 @@ Real-device field notes on controlling Android apps on a separate virtual displa
 
 **Observation date: 2026-11-16.** Versions below are the tested versions, not a promise that they are the newest releases. The published findings are author-reported, sanitized observations. Private device captures and raw logs are intentionally not included, so readers should reproduce the tests rather than treat the repository as independently auditable raw evidence.
 
+## Pixel 10 Pro XL / Android 17 update
+
+Non-root VirtualScreen + Shizuku shell passed locked/off semantic probe click/set-text with an experimental per-display power override; locked coordinate taps still FAILED. An unlocked, authorized WhatsApp read/send session ran on a virtual display while TikTok stayed physical foreground at sampled checks, followed by background-task restoration. No automatic Wireless debugging enablement; no universal app or transient-focus guarantee.
+
+[Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
+
 ## The short answer
 
 - **Root is neither necessary nor sufficient.** On a rooted Samsung A32, Virtual Screen's Root backend failed a package/UID check. An ADB-started Shizuku server running as **shell UID 2000** worked.

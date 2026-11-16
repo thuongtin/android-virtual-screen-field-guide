@@ -9,6 +9,12 @@
 公开内容是作者报告并脱敏后的实验摘要。私人截图和原始日志未公开，因此不构成可独立审计的原始证据。
 请按文档自行复现，并明确区分源码解释、后端诊断、应用调用和完整 AI 任务。
 
+## Pixel 10 Pro XL / Android 17 更新
+
+无 root 的 VirtualScreen + Shizuku shell 通过了锁屏、息屏状态下测试页面的语义点击和文本设置，需要实验性的单显示器电源覆盖；锁屏坐标点击仍然失败。解锁时，经用户授权在虚拟显示器读取和发送 WhatsApp 消息，采样检查中 TikTok 仍在主屏前台，之后 WhatsApp 回到后台。不自动开启无线调试；不保证所有应用或完全没有瞬时焦点变化。
+
+[Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
+
 ## 核心结论
 
 - **Root 既非必要条件，也非充分条件。** 已 root 的 Samsung A32 在 Virtual Screen 的 Root 后端遇到 package/UID 错误；改用 ADB 启动、以 shell UID `2000` 运行的 Shizuku 后，限定测试通过。

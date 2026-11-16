@@ -153,6 +153,60 @@
         "wifi_roaming",
         "reboot_recovery"
       ]
+    },
+    {
+      "id": "pixel17-locked-serving-semantic",
+      "device_family": "Pixel 10 Pro XL",
+      "android": 17,
+      "root_available": false,
+      "app": "VirtualScreen",
+      "version": "0.2.1",
+      "startup_path": "ADB-started Shizuku shell UID 2000",
+      "physical_display": "OFF",
+      "device_locked": true,
+      "device_secure": true,
+      "virtual_power_group_observed": 0,
+      "power_override": "owned virtual display only; experimental requestDisplayPower",
+      "serving_mcp_tested": true,
+      "probe_semantic_click": "PASS",
+      "probe_semantic_set_text": "PASS",
+      "probe_coordinate_tap": "FAIL: acknowledged without counter change",
+      "cached_capture_after_reset_observed": true,
+      "wireless_settings_changed": false,
+      "not_tested": [
+        "locked_third_party_apps",
+        "long_idle",
+        "roaming",
+        "reboot_recovery",
+        "model_autonomous_ai_workflow"
+      ]
+    },
+    {
+      "id": "pixel17-unlocked-parallel-whatsapp",
+      "device_family": "Pixel 10 Pro XL",
+      "android": 17,
+      "root_available": false,
+      "app": "VirtualScreen",
+      "version": "0.2.1",
+      "startup_path": "ADB-started Shizuku shell UID 2000",
+      "device_locked": false,
+      "task_move_approved": true,
+      "virtual_app": "WhatsApp",
+      "physical_app": "TikTok",
+      "serving_mcp_conversation_read": "PASS",
+      "separately_authorized_message_send": "Delivered",
+      "physical_foreground_preserved_at_sampled_checks": true,
+      "continuous_focus_trace": false,
+      "task_restore": "display 0, onTop=false, visible=false",
+      "app_restart_used": false,
+      "owned_display_lease_forward_cleaned": true,
+      "wireless_settings_changed": false,
+      "not_tested": [
+        "both_parties_using_same_app_task",
+        "all_apps",
+        "zero_transient_focus_change",
+        "model_autonomous_ai_workflow"
+      ]
     }
   ]
 }

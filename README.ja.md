@@ -9,6 +9,12 @@
 公開内容は著者が報告し、機密情報を除去した要約です。非公開の画面キャプチャや生ログは含みません。
 そのため、公開要約を独立監査可能な生の証拠とは扱わず、読者自身で再現してください。
 
+## Pixel 10 Pro XL / Android 17 の更新
+
+root なしの VirtualScreen + Shizuku shell で、ロック・画面消灯中のテスト画面に対する意味的クリックとテキスト設定を検証しました。実験的なディスプレイ単位の電源オーバーライドが必要で、ロック中の座標タップは依然として失敗しています。ロック解除中は、ユーザーの承認を得て仮想画面で WhatsApp の閲覧と送信を行い、サンプリング確認では TikTok が実画面の前面に残りました。その後 WhatsApp をバックグラウンドへ戻しました。ワイヤレスデバッグは自動で有効にしません。すべてのアプリや瞬間的なフォーカス変化の防止は保証しません。
+
+[Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
+
 ## 要点
 
 - **Root は必要条件でも十分条件でもありません。** Root 済みの Samsung A32 では Virtual Screen の Root バックエンドが package/UID エラーで失敗しました。ADB から起動した shell UID `2000` の Shizuku では限定テストに成功しました。

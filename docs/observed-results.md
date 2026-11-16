@@ -133,11 +133,19 @@ The image was visually inspected and showed the actual app UI, not the lock scre
 
 The private image is not published, and this single app result does not establish support for protected-content capture or every app.
 
-### Lifecycle failure remains unresolved
+### Initial lifecycle failure: cause remains unresolved
 
 Wireless ADB disappeared while the tablet was locked. After the user re-enabled wireless debugging, no Mika helper process was found. The documented startup script restored it while the device remained locked.
 
-The timing does **not** establish that locking alone killed the helper or identify the exact cause. It does establish that the helper was absent at the later checkpoint and that this run needed manual recovery. No reboot was performed. Automatic reconnection, automatic helper recovery and post-reboot operation are unverified.
+The timing does **not** establish that locking alone killed the helper or identify the exact cause. It does establish that the helper was absent at the later checkpoint and that this run needed manual recovery. No reboot was performed. Automatic recovery was not verified in that initial computer-started session. The follow-up below tests a different, narrower boundary after Mika gained its own pairing.
+
+### Follow-up: own pairing and awake helper-only recovery
+
+Mika was subsequently paired through its own setup UI, which reported **Paired** and **Connected**. The current Wi-Fi trust, `WRITE_SECURE_SETTINGS` grant and both recovery toggles already existed. Own pairing supplied the missing prerequisite, and the computer-start-only warning disappeared.
+
+With the tablet **Awake/unlocked** and Wireless debugging **on**, a bounded test terminated only the identity-checked shell helper. A replacement helper was observed approximately **5 seconds** after the test began, with no manual startup or rescue. Mika's own post-recovery self-check passed **12/12 in 41 seconds**, exercising the actual serving helper rather than the earlier standalone native diagnostic. Baseline and immediate post-pairing self-checks also passed 12/12, in 42 and 41 seconds respectively.
+
+This does not resolve the earlier incident's cause or verify automatic recovery with wireless debugging off, while securely locked, after long idle/roaming or after reboot. The combined locked/wireless-off test was not run. See [the wireless-debugging guide and community reports](wireless-debugging.md).
 
 ## Claims this guide deliberately does not make
 

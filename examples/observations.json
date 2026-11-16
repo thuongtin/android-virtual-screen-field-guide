@@ -109,7 +109,50 @@
       "manual_script_restart_succeeded": true,
       "cause_of_helper_exit": "not established",
       "automatic_recovery_verified": false,
-      "reboot_tested": false
+      "reboot_tested": false,
+      "phase": "initial_computer_start_before_mika_pairing"
+    },
+    {
+      "id": "xiaomi-paired-helper-recovery",
+      "device_family": "Xiaomi Pad Mini",
+      "android": 16,
+      "root_available": false,
+      "app": "Mika",
+      "version": "0.1.44",
+      "build": "2b26f3f",
+      "startup_path": "Mika own wireless pairing",
+      "pairing_ui": [
+        "Paired",
+        "Connected"
+      ],
+      "existing_prerequisites": [
+        "trusted_current_wifi",
+        "write_secure_settings_granted",
+        "restore_after_restart_enabled",
+        "auto_wireless_debugging_enabled"
+      ],
+      "wakefulness": "Awake",
+      "keyguard_showing": false,
+      "wireless_debugging_during_test": "on",
+      "injection": "SIGTERM to identity-checked shell helper only",
+      "replacement_helper_observed_at_test_seconds": 5,
+      "manual_rescue_used": false,
+      "automatic_helper_recovery_verified": true,
+      "post_recovery_self_check": {
+        "pass": 12,
+        "partial": 0,
+        "fail": 0,
+        "skipped": 0,
+        "seconds": 41
+      },
+      "serving_helper_exercised_by_app_self_check": true,
+      "app_ai_e2e_tested": false,
+      "not_tested": [
+        "wireless_off_while_locked_recovery",
+        "long_idle",
+        "wifi_roaming",
+        "reboot_recovery"
+      ]
     }
   ]
 }

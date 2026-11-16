@@ -11,7 +11,7 @@ Ghi chép thực nghiệm điều khiển ứng dụng Android trên **màn hìn
 1. **Có root chưa chắc chạy được; không root vẫn có thể chạy.** A32 đã root nhưng Root backend của Virtual Screen bị lỗi package/UID. Đổi sang Shizuku chạy bằng ADB, UID `2000(shell)`, thì luồng kiểm tra hoạt động.
 2. **Tắt màn hình khác với khóa PIN/pattern.** A32 được kiểm ở trạng thái màn hình tắt nhưng `keyguard showing=false`. Không dùng kết quả đó để khẳng định đã kiểm khóa bảo mật.
 3. **Pad Mini non-root đã đạt 12/12 self-check khi mở khóa.** Khi khóa thật, một tiến trình chẩn đoán dùng backend native của APK Mika cũng mở app, đọc, chạm và gõ được. Tuy nhiên đó không phải self-check của app hoặc tác vụ AI trọn luồng.
-4. **Giữ kết nối và khôi phục helper là bài toán riêng.** Wireless ADB đã mất trong phiên. Khi user bật lại, helper không còn chạy và phải khởi động lại bằng script. Chưa kiểm chứng tự hồi phục hay hoạt động sau reboot.
+4. **Khôi phục helper đã có bằng chứng giới hạn mới.** Sau khi Mika pair trực tiếp qua UI, thử khi mở khóa/`Awake`, giữ Wireless debugging bật: dừng đúng shell helper bằng `TERM`, app tự tạo helper mới trong khoảng 5 giây, không rescue hay start thủ công; self-check sau đó đạt 12/12 trong 41 giây. Lỗi mất kết nối khi khóa trước đó vẫn được giữ, nguyên nhân chưa rõ; chưa kiểm tắt Wireless debugging khi khóa, reboot, long idle hoặc roaming.
 
 ## Ma trận đã kiểm
 
@@ -20,7 +20,7 @@ Ghi chép thực nghiệm điều khiển ứng dụng Android trên **màn hìn
 | Samsung A32, Android 13 / One UI 5.1, đã root; Virtual Screen 0.2.1 Root backend | `ROOT_OPERATION_FAILED`, chi tiết `SecurityException: packageName must match the calling uid` | Kết quả của ROM/backend này, không khái quát mọi máy root |
 | A32, Shizuku 13.6.0 khởi động qua ADB | MCP liệt kê 19 tools; mở Settings, đọc node, chạm và gõ đã kiểm khi màn hình vật lý `DOZE_SUSPEND` | Không có keyguard bảo mật đang hiển thị; không phải toàn bộ 19 tools đều được chạy lại |
 | Self-check UI của Virtual Screen trên A32 | Lượt đầu 18/19, Tap lỗi | Lượt tap/type riêng sau đó thành công không xóa kết quả lỗi ban đầu |
-| Xiaomi Pad Mini, Android 16, non-root, Mika 0.1.44 build `2b26f3f` | Self-check trong app: 12 pass, 0 partial, 0 fail, 0 skipped, 41 giây | Kiểm khi mở khóa |
+| Xiaomi Pad Mini, Android 16, non-root, Mika 0.1.44 build `2b26f3f` | Self-check trong app đều 12 pass, 0 partial, 0 fail, 0 skipped: baseline 42 giây, sau pairing 41 giây, sau recovery 41 giây | Kiểm khi mở khóa; recovery chỉ thử helper chết khi `Awake`, Wireless debugging bật |
 | Pad Mini, khóa thật và màn hình tắt | Backend native của APK đang cài: tạo display, đọc node, tap tăng bộ đếm, gõ có readback; `Asleep`, `OFF`, `showing=true` | Tiến trình shell chẩn đoán riêng, không gọi RPC helper đang phục vụ Mika, không phải app/AI E2E |
 | Pad Mini khóa thật, TikTok Studio 44.6.3 | Mở app và chụp frame thật 1880×3008 trên virtual display | Chỉ mở/chụp; không đăng bài hoặc thao tác tài khoản |
 
@@ -32,7 +32,7 @@ Chi tiết lịch sử pass/fail và cách nghiệm thu: [Observed results](docs
 |---|---|---|
 | Máy đã root, `su` hoạt động | Thử Root backend chính thức với grant riêng cho đúng app | Root không tự vượt được kiểm tra package attribution hoặc chính sách display của ROM |
 | Root backend lỗi, ADB đang dùng được | Chạy **Shizuku bằng ADB**, cấp quyền cho đúng app | Shizuku chạy bằng root và chạy bằng shell là hai identity khác nhau |
-| Non-root, dùng Mika | Cài app rồi chạy helper bằng lệnh chính thức trên đúng serial | Mac đã paired ADB không có nghĩa Mika đã paired riêng |
+| Non-root, dùng Mika | Cài app; chọn script computer-start hoặc pair trực tiếp trong Mika | Mac đã paired ADB không có nghĩa Mika đã paired riêng; lần mới UI Mika đã hiện `Paired`/`Connected` |
 | Không root và không ADB/helper | Xem API thông thường hoặc MediaProjection với sự đồng ý của user | Không tự có quyền nhập liệu xuyên app hay mở app khác trên màn hình nền riêng |
 | App có xác thực hoặc nội dung được bảo vệ | Kiểm riêng app, theo luồng xác thực/chụp màn hình bình thường | Không vô hiệu hóa bảo vệ để biến ảnh đen thành ảnh chụp |
 
@@ -66,13 +66,15 @@ MCP chỉ nghe loopback; `adb forward` nối máy điều khiển tới cổng �
 
 ## Non-root: kinh nghiệm từ Pad Mini
 
-Mika 0.1.44 được cài đúng ABI arm64. Helper chính thức được start qua kết nối wireless ADB đã có, bằng script tên `usb-start.sh`. Tên script không có nghĩa phải dùng cáp USB, nhưng cũng không có nghĩa Mika đã được pairing riêng.
+Ban đầu Mika 0.1.44 dùng helper start từ máy tính qua kết nối ADB đã có, bằng script chính thức `usb-start.sh`. Lần mới đã pair trực tiếp trong UI Mika và quan sát `Paired`/`Connected`. Mac đã paired ADB vẫn không tương đương Mika đã paired.
 
-Các thiết lập HyperOS đã kiểm: Accessibility bound, thông báo được phép, pin không hạn chế, autostart bật, app khóa trong Recent apps và mạng Wi-Fi đã được tin cậy cho ADB. Các thiết lập đó giúp chuẩn bị môi trường, **không bảo đảm helper sống mãi hoặc tự phục hồi sau reboot**.
+Các thiết lập đã có sẵn gồm Accessibility bound, thông báo được phép, pin không hạn chế, autostart, khóa app trong Recent apps, `WRITE_SECURE_SETTINGS` và Wi-Fi trust. Hai tùy chọn recovery vốn đã bật; pairing trực tiếp nay đáp ứng prerequisite còn thiếu, không phải vừa bật các quyền hay tùy chọn đó. Không suy thành bảo đảm helper sống mãi hoặc tự phục hồi sau reboot.
 
 Self-check đầu tiên đạt 11 pass và 1 partial do thông báo tắt. Sau khi bật thông báo, chạy lại được 12/12. Không hạ tiêu chí hoặc bỏ qua mục lỗi.
 
-Khi khóa, đã kiểm riêng backend native và chụp được TikTok Studio trong khi panel vẫn `OFF`. Không nhập PIN/pattern, không bỏ keyguard. Sau khi mất Wireless ADB, helper vẫn phải start lại thủ công. Đây là giới hạn vận hành cần báo rõ, không che bằng kết quả self-check trước đó.
+Khi khóa, đã kiểm riêng backend native và chụp được TikTok Studio trong khi panel vẫn `OFF`. Không nhập PIN/pattern, không bỏ keyguard. Ở phiên cũ, Wireless ADB mất và phải start lại helper thủ công; nguyên nhân chưa rõ, kết quả mới không xóa failure đó.
+
+Lần mới chỉ thử helper chết khi mở khóa/`Awake` và Wireless debugging vẫn bật: kiểm identity shell helper trước `TERM`, quan sát helper mới sau khoảng 5 giây, không rescue/manual start; self-check của chính Mika đạt 12 pass, 0 partial, 0 fail, 0 skipped trong 41 giây. Baseline 42 giây và sau pairing 41 giây cũng đều 12/12. Chưa kiểm Wireless debugging tắt khi khóa, reboot, long idle hoặc roaming. Xem [Wireless debugging và recovery](docs/wireless-debugging.md).
 
 ## Quy tắc tái lập
 

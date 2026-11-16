@@ -106,7 +106,8 @@ Tested: Xiaomi Pad Mini model 25079RPDCG, Android 16, non-root, Mika 0.1.44, ins
 | Disposable standalone shell process loading `ShellService` from installed APK; physical state `Asleep`, display `OFF`, secure keyguard `showing=true` | Create, read, tap and type passed on the virtual display | Serving-helper RPC, Mika app orchestration or full AI end-to-end completion |
 | Same native-helper code, actual TikTok Studio 44.6.3 while secure keyguard showed | App launch and 1880 x 3008 capture passed | Any interaction with TikTok Studio, account action or all-app compatibility |
 | Wireless ADB dropped; user re-enabled it | Helper was absent afterward | Automatic helper recovery |
-| Documented `usb-start.sh` run manually | Helper restored | Recovery without manual intervention or after reboot; no reboot test was performed |
+| Documented `usb-start.sh` run manually in the initial session | Helper restored | Recovery without manual intervention or after reboot; no reboot test was performed |
+| Follow-up after Mika own pairing, Awake/unlocked, wireless debugging on, deliberate helper-only termination | Replacement helper observed in about 5 seconds without rescue; Mika self-check after recovery 12/12 in 41 seconds | Wireless-off/locked, long-idle, roaming or reboot recovery; full AI task |
 
 The standalone helper experiment is a diagnostic of installed native code. Do not describe it as an RPC call to the running helper or as a completed Mika AI task. A production integration needs its own app-level validation after native compatibility is established.
 
@@ -126,7 +127,7 @@ Ordinary MediaProjection is a consented capture API with session and stop semant
 | Display creates but frame freezes after inactivity | Virtual display state/group, keep-awake availability, helper liveness | A separate group's timer may explain it; do not assume another tap or keeping the main screen on proves the fix. |
 | Tap changes the wrong screen or text lands elsewhere | Display ID, current task, focused window and fresh observation | Stop input, re-observe and restore prior focus if this test changed it. Shared-focus fallback needs its own test. |
 | App launch returns to an already running instance | Existing task/display inventory and launch mode | Android task reuse may be involved. Do not force-stop or restart an app to manufacture a pass. |
-| Helper absent after transport loss | App status and helper liveness, then authorized ADB identity | On the observed Xiaomi, manual documented startup restored it. Do not report automatic recovery. |
+| Helper absent after transport loss | App status and helper liveness, then authorized ADB identity | On the observed Xiaomi, manual documented startup restored it. Do not report this initial incident as automatic recovery; a later awake helper-only test passed after own pairing. |
 | Secure or DRM region is blank | Whether the app uses protected windows/output | Record the limitation; another ordinary app's capture does not contradict it. |
 
 For an app already running on another display, first save task IDs, display assignment and main-display focus. If the platform exposes task relocation and the owner explicitly chooses a disposable test, inspect that device's command help and move only the identified task, then verify both displays and restore the original task location/focus. This is a conditional diagnostic, not a general portable recipe: task launch modes, resizeability, OEM policy and API availability differ. The separate [Facebook capture experiment](observed-results.md#facebook-task-reuse-and-capture) did verify task relocation and restoration on the A32, using direct ADB task management plus MCP capture rather than pure MCP launch. That specific result is not a portability guarantee.
@@ -147,3 +148,7 @@ Use the actual host port if a different one was allocated. Do not stop the globa
 - Treat app/helper updates, helper death, wireless reconnection, idle periods and reboot as separate acceptance tests. Upstream documents restart behavior for each startup path, but this field guide's Xiaomi reboot behavior is **not tested**.
 
 A useful final report states version/build, backend and identity, physical and virtual display states, exact tested boundary, initial failures, later bounded successes and untested lifecycle cases. Do not compress these into “works locked” or “fully supported.”
+
+## 8. Wireless-debugging recovery follow-up
+
+See [Wireless debugging: auto-off, reconnection and helper recovery](wireless-debugging.md) for Chinese/English community reports, the normal Mika pairing procedure, the bounded awake recovery result and the remaining untested boundaries.

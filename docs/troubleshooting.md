@@ -21,6 +21,10 @@
 | Old UI prompt no longer exists | A fresh observation of the current app | That a requested Save/confirm was already performed |
 | OEM background exemptions enabled, helper still dies | Actual process and transport chronology | That exemptions guarantee indefinite service life |
 
+## Wireless debugging turns off
+
+Separate the switch, transport, authorization and helper states. See [Chinese/English community reports and the Mika follow-up](wireless-debugging.md) before treating authorization timeout, battery settings or legacy TCP as interchangeable fixes. The follow-up verified awake helper-only recovery with wireless debugging still enabled, not locked wireless-off or reboot recovery.
+
 ## A focused failure report
 
 Use a redacted template like this, without a device serial or account identifier:

@@ -12,7 +12,7 @@ Real-device field notes on controlling Android apps on a separate virtual displa
 - **Non-root can work.** On a Xiaomi Pad Mini with Android 16, Mika's own unlocked-device self-check passed **12/12**. A separate diagnostic process using the installed APK's native backend also launched, read, tapped and typed on its virtual display while the physical device remained securely locked and off.
 - **Screen off is not the same as secure keyguard.** The A32 tests had no secure keyguard showing. Do not generalize them to PIN/pattern-locked Samsung devices.
 - **A working backend is not a complete AI-agent test.** The Xiaomi locked tests did not invoke the serving helper's RPC and did not run a complete Mika AI task. No model or API key was configured.
-- **Lifecycle recovery matters.** Wireless ADB disappeared during the session. After the user re-enabled it, the Xiaomi helper was absent and required a manual restart. Automatic recovery and post-reboot operation remain unverified.
+- **Recovery now has a bounded positive result.** After direct Mika pairing, an unlocked/`Awake` test kept Wireless debugging on, sent `TERM` to the identity-checked shell helper, and observed a new helper within about 5 seconds without rescue or manual startup. Mika then passed 12/12 in 41 seconds. The earlier locked transport-loss/manual-recovery failure remains unexplained; wireless-off while locked, reboot, long idle and roaming remain untested.
 
 ## What was actually tested
 
@@ -21,7 +21,7 @@ Real-device field notes on controlling Android apps on a separate virtual displa
 | Samsung A32, Android 13 / One UI 5.1, rooted | Virtual Screen 0.2.1, Root backend | `ROOT_OPERATION_FAILED`: `SecurityException: packageName must match the calling uid` | This ROM/backend combination, not all root implementations |
 | Same A32, ADB-started Shizuku | Shizuku 13.6.0, Virtual Screen MCP | 19 tools listed; Settings launch, tree reading, tap and typing verified while physical display stayed `DOZE_SUSPEND` | No secure keyguard showing; not all 19 tools retested |
 | Same A32, app compatibility check | Virtual Screen 0.2.1 | Initial check: 18/19, with Tap failed | Later bounded tap/type success does not erase that earlier result |
-| Xiaomi Pad Mini, Android 16, non-root | Mika 0.1.44, build `2b26f3f` | Built-in self-check: 12 pass, 0 partial, 0 fail, 0 skipped in 41 seconds | Unlocked-device self-check |
+| Xiaomi Pad Mini, Android 16, non-root | Mika 0.1.44, build `2b26f3f` | Built-in self-check: 12 pass, 0 partial, 0 fail, 0 skipped; baseline 42 seconds, after pairing 41 seconds, after recovery 41 seconds | Unlocked; recovery tested only helper death while `Awake` with Wireless debugging on |
 | Same Xiaomi, securely locked and screen off | Installed Mika APK's `ShellService`, separate temporary shell process | Virtual display, test-page nodes, tap counter and typed-text readback passed; `Asleep`, physical `OFF`, keyguard `showing=true` | Native backend diagnostic, not serving-helper RPC or app/AI E2E |
 | Same Xiaomi, securely locked | Same native capture path; TikTok Studio 44.6.3 | App launched and a real 1880×3008 frame was captured; physical display remained off | Read-only launch/capture, no posting or account interaction |
 
@@ -33,7 +33,7 @@ For methodology and unsuccessful attempts, see [Observed results](docs/observed-
 |---|---|---|
 | Rooted phone, existing `su` works | Try the application's supported Root backend with an app-specific grant | Root does not bypass Android package attribution, display policy or ROM behavior |
 | Root path fails, USB/authorized wireless ADB is available | Run Shizuku through **ADB**, then authorize only the target app | Verify UID 2000. Starting Shizuku with root is a different execution identity |
-| Non-root Android with Mika support | Install Mika and start its documented helper using the selected device's ADB connection | Mac-to-device ADB trust is not Mika's own wireless pairing |
+| Non-root Android with Mika support | Install Mika; use computer-start or direct pairing in Mika | Mac-to-device ADB trust is not Mika's own pairing; the later Mika UI showed `Paired`/`Connected` |
 | No root and no ADB/helper | Consider ordinary app APIs or a user-consented MediaProjection workflow | These do not grant arbitrary cross-app input or automatically provide a private background app display |
 | Sensitive/protected apps or content | Test the specific app and honor its normal authentication and capture rules | Blank or blocked protected content is not a reason to defeat those rules |
 
@@ -59,6 +59,14 @@ These are **different control paths**, not interchangeable names:
 1. **Virtual Screen + MCP:** app-level authorization, session, control lease, current observation, action, readback and cleanup.
 2. **Mika's normal app workflow:** its own helper, accessibility service and optional model configuration.
 3. **Standalone native diagnostic:** a temporary shell process instantiated `ShellService` from the installed Mika APK. This established a device/backend capability; it did not establish Mika app-level orchestration or expose a production remote-control endpoint. The version-coupled experimental harness is not shipped here as a supported SDK.
+
+## Mika pairing and bounded recovery
+
+Mika 0.1.44 on the non-root Android 16 Pad Mini initially used the documented computer-start script `usb-start.sh`. Later, direct pairing through Mika's own UI showed `Paired`/`Connected`. Existing `WRITE_SECURE_SETTINGS` permission and Wi-Fi trust were already present; both recovery toggles were already enabled. Direct pairing satisfied their missing prerequisite rather than newly enabling those settings.
+
+The new test checked the shell helper's identity before `TERM` and observed an app-created replacement within about 5 seconds, while unlocked/`Awake` with Wireless debugging left on. No rescue or manual startup was used. Mika's own post-recovery self-check reported 12 pass, 0 partial, 0 fail, 0 skipped in 41 seconds; baseline 42 seconds and post-pairing 41 seconds also passed 12/12.
+
+The earlier locked-session transport disappearance and manual recovery remain part of the record, with no established cause. This helper-only recovery result does not test wireless-off plus locked state, reboot, long idle or roaming, and is not an AI E2E result. See [Wireless debugging and recovery](docs/wireless-debugging.md).
 
 ## Minimal operating rules
 

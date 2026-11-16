@@ -15,7 +15,7 @@
 - **非 root でも動作する経路があります。** Xiaomi Pad Mini の Mika 自己診断はロック解除中に 12/12 を通過しました。セキュアロック中は別途ネイティブバックエンドを診断しました。
 - **画面オフとセキュアロックは別です。** A32 は `keyguard showing=false` でした。PIN/パターンでロックされた状態への一般化はできません。
 - **バックエンドの成功は agent 全体の成功ではありません。** Pad Mini のロック中テストは稼働中 helper の RPC や Mika アプリ/AI の E2E を実行していません。モデルや API key も設定していません。
-- **復旧能力は別途検証が必要です。** Wireless ADB が消失し、ユーザーが再度有効にした後も helper は不在で、手動再起動が必要でした。自動復旧と端末再起動後の動作は未検証です。
+- **復旧には新たな限定的成功があります。** Mika で直接ペアリング後、ロック解除/`Awake` で Wireless debugging を有効のまま、実行主体を確認した shell helper に `TERM` を送りました。約 5 秒でアプリによる新 helper の生成を観察し、救済操作や手動起動なしで自己診断 12/12、41 秒を達成しました。以前のロック中の接続消失・手動復旧の失敗は原因不明のまま残し、無線デバッグを無効にしたロック状態、再起動、長時間アイドル、ネットワークローミングは未試験です。
 
 ## 実際に検証した範囲
 
@@ -24,7 +24,7 @@
 | Samsung A32、Android 13 / One UI 5.1、root 済み；Virtual Screen 0.2.1 Root バックエンド | `ROOT_OPERATION_FAILED`；`SecurityException: packageName must match the calling uid` | この ROM/バックエンドの組み合わせの結果であり、すべての root 実装の結果ではない |
 | 同じ A32；ADB 起動の Shizuku 13.6.0；Virtual Screen MCP | 19 ツールを列挙；Settings 起動、ノード読取、タップ、文字入力を確認；物理画面は `DOZE_SUSPEND` | `keyguard showing=false`；19 ツールすべてを再試験したわけではない |
 | 同じ A32；アプリ初回自己診断 | 18/19、Tap が失敗 | 後続の限定タップ/入力成功で初回の失敗を上書きしない |
-| Xiaomi Pad Mini、Android 16、非 root；Mika 0.1.44、build `2b26f3f` | 自己診断 12 pass、0 partial、0 fail、0 skipped、41 秒 | ロック解除中の検証 |
+| Xiaomi Pad Mini、Android 16、非 root；Mika 0.1.44、build `2b26f3f` | 自己診断はいずれも 12 pass、0 partial、0 fail、0 skipped：ベースライン 42 秒、ペアリング後 41 秒、復旧後 41 秒 | ロック解除中；復旧は `Awake`、Wireless debugging 有効時の helper 終了のみ検証 |
 | 同じ Pad Mini；セキュアロック中かつ画面オフ | インストール済み APK の `ShellService` を独立した一時 shell プロセスで使用；表示作成、ノード読取、タップカウンター、入力読戻しに成功 | `Asleep`、物理 `OFF`、`showing=true`；稼働中 helper の RPC やアプリ/AI E2E ではない |
 | 同じ Pad Mini；セキュアロック中；TikTok Studio 44.6.3 | 実アプリの起動と 1880×3008 フレームの取得に成功；物理画面はオフを維持 | 起動と取得のみ。投稿やアカウント操作は未実施 |
 
@@ -64,12 +64,16 @@ MCP は認証を維持して loopback のみに置き、選択した端末の AD
 
 ## Pad Mini：互換性と復旧を分ける
 
-Mika 0.1.44 の公式 `usb-start.sh` は、既存の承認済み ADB 経路から実行できます。
-名前が USB ケーブル必須を意味するわけではなく、Mika 自身の無線ペアリング完了を証明するものでもありません。
+Mika 0.1.44 は当初、既存の承認済み ADB 経路で公式のコンピューター起動スクリプト `usb-start.sh` を使用しました。
+その後、Mika 自身の UI で直接ペアリングし、`Paired`/`Connected` を観察しました。Mac の ADB ペアリングと Mika 自身のペアリングは別です。
+`WRITE_SECURE_SETTINGS` と Wi-Fi trust はすでにあり、二つの復旧トグルも以前から有効でした。直接ペアリングで不足していた前提条件を満たしたのであり、これらの許可やトグルを新たに有効にしたわけではありません。
 最初の自己診断は通知無効により 11 pass、1 partial でした。通知を有効にして再実行し、12/12 になりました。
 Accessibility、通知、電池制限解除、自動起動、履歴画面での固定は準備であり、helper の永続稼働を保証しません。
 ロック中の診断では PIN/パターンを入力せず、物理 keyguard も解除せず、独立画面のネイティブ機能のみ確認しました。
-Wireless ADB の消失後は、再接続しても helper の手動起動が必要でした。自動復旧として報告しないでください。
+以前のロック中セッションで Wireless ADB が消失し、再接続後も helper の手動起動が必要だった失敗は残します。原因はまだ特定されていません。
+今回はロック解除/`Awake` かつ Wireless debugging を有効のまま、実行主体を確認した shell helper に `TERM` を送り、約 5 秒後にアプリが作成した新 helper を観察しました。救済操作や手動起動は行いませんでした。
+Mika 自身の復旧後診断は 12 pass、0 partial、0 fail、0 skipped、41 秒でした。ベースライン 42 秒とペアリング後 41 秒も 12/12 でした。
+無線デバッグを無効にしたロック状態、端末再起動、長時間アイドル、ネットワークローミングは未試験です。helper 単体の復旧を AI E2E 成功と解釈しないでください。[Wireless debugging と復旧](docs/wireless-debugging.md)を参照してください。
 
 ## 許可・入力・ライフサイクルの注意
 

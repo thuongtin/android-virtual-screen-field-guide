@@ -15,7 +15,7 @@
 - **非 root 设备也有可行路径。** Xiaomi Pad Mini 的 Mika 解锁状态自检为 12/12；安全锁屏状态另有原生后端诊断成功。
 - **熄屏不等于安全锁屏。** A32 的 `keyguard showing=false`，不能据此推断 PIN/图案锁下也能工作。
 - **后端成功不等于完整 agent 成功。** Pad Mini 锁屏实验没有调用正在服务的 helper RPC，也没有运行 Mika 应用或 AI 端到端任务。未配置模型或 API key。
-- **恢复能力必须单独验证。** Wireless ADB 曾消失；用户重新启用后 helper 不在运行，必须手动重启。自动恢复和重启设备后的恢复均未验证。
+- **恢复已有新的限定成功结果。** Mika 直接配对后，在解锁/`Awake` 且 Wireless debugging 保持开启时，对核实身份的 shell helper 发送 `TERM`，约 5 秒后观察到应用创建新 helper，无需救援或手动启动；随后自检 12/12，41 秒。先前锁屏时传输消失、必须手动恢复的失败仍保留，原因未明；关闭 Wireless debugging 且锁屏、重启、长时间空闲及网络漫游仍未测试。
 
 ## 已验证的范围
 
@@ -24,7 +24,7 @@
 | Samsung A32，Android 13 / One UI 5.1，已 root；Virtual Screen 0.2.1 Root 后端 | `ROOT_OPERATION_FAILED`；`SecurityException: packageName must match the calling uid` | 仅代表本次 ROM/后端组合，不代表所有 root 实现 |
 | 同一 A32；ADB 启动 Shizuku 13.6.0；Virtual Screen MCP | 列出 19 个工具；Settings 启动、节点读取、点击和输入通过；物理显示为 `DOZE_SUSPEND` | `keyguard showing=false`；未重新逐个测试全部 19 个工具 |
 | 同一 A32；应用首次自检 | 18/19，Tap 失败 | 后续限定点击与输入成功不覆盖首次失败 |
-| Xiaomi Pad Mini，Android 16，非 root；Mika 0.1.44，build `2b26f3f` | 自检 12 pass、0 partial、0 fail、0 skipped，41 秒 | 在设备已解锁时执行 |
+| Xiaomi Pad Mini，Android 16，非 root；Mika 0.1.44，build `2b26f3f` | 自检均为 12 pass、0 partial、0 fail、0 skipped：基线 42 秒、配对后 41 秒、恢复后 41 秒 | 解锁状态；恢复仅测试 `Awake` 且 Wireless debugging 开启时 helper 终止 |
 | 同一 Pad Mini；安全锁屏且熄屏 | 已安装 APK 的 `ShellService` 在独立临时 shell 进程中创建显示、读取节点、点击计数和输入回读成功 | `Asleep`、物理 `OFF`、`showing=true`；不是服务中 helper 的 RPC 或应用/AI E2E |
 | 同一 Pad Mini；安全锁屏；TikTok Studio 44.6.3 | 实际应用启动并捕获 1880×3008 图像；物理屏幕保持关闭 | 仅启动与截图，未发布内容或操作账号 |
 
@@ -64,12 +64,16 @@ MCP 应保留认证并仅监听 loopback，通过选定设备的 ADB forward 连
 
 ## Pad Mini 的经验：成功与生命周期分开报告
 
-Mika 0.1.44 的 helper 可通过现有授权 ADB 通道运行官方 `usb-start.sh`。
-脚本名称不意味着必须使用 USB，也不证明 Mika 已完成自己的无线配对或保存了可重连身份。
+Mika 0.1.44 最初通过现有授权 ADB 通道运行官方计算机启动脚本 `usb-start.sh`。
+随后在 Mika 自身 UI 中直接配对，观察到 `Paired`/`Connected`。Mac 的 ADB 配对仍不等于 Mika 自身配对。
+`WRITE_SECURE_SETTINGS` 和 Wi-Fi trust 原已具备，两个恢复开关也早已开启；本次直接配对满足了此前缺失的前提，并非新开启这些权限或开关。
 首次自检为 11 pass、1 partial，原因是通知关闭；开启通知后重新自检才达到 12/12。
 Accessibility、通知、电池不受限、自启动和最近任务锁定等准备不能保证 helper 永久存活。
 锁屏诊断未输入 PIN/图案，也未解除物理 keyguard；它仅验证独立显示的原生能力。
-Wireless ADB 消失后，即使用户恢复连接，helper 仍需手动启动。不要将此描述为自动恢复。
+先前锁屏会话中 Wireless ADB 消失、恢复连接后 helper 仍需手动启动的失败保留，原因尚未确定。
+本次仅在解锁/`Awake` 且 Wireless debugging 保持开启时，核实 shell helper 身份后发送 `TERM`；约 5 秒后观察到应用自动创建新 helper，没有救援或手动启动。
+Mika 自身恢复后自检为 12 pass、0 partial、0 fail、0 skipped，41 秒；基线 42 秒和配对后 41 秒也均为 12/12。
+关闭 Wireless debugging 且锁屏、设备重启、长时间空闲与网络漫游仍未测试；不能将 helper 单项恢复解释为 AI E2E 成功。详见 [Wireless debugging 与恢复](docs/wireless-debugging.md)。
 
 ## 权限、输入与清理规则
 

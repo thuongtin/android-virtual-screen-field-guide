@@ -15,7 +15,7 @@
 - **Root 없이도 가능한 경로가 있습니다.** Xiaomi Pad Mini의 Mika 자체 점검은 잠금 해제 상태에서 12/12를 통과했습니다. 보안 잠금 상태에서는 별도의 네이티브 백엔드 진단을 수행했습니다.
 - **화면 꺼짐과 보안 잠금은 다릅니다.** A32는 `keyguard showing=false`였으므로 PIN/패턴 잠금 결과로 일반화할 수 없습니다.
 - **백엔드 성공은 agent 전체 성공이 아닙니다.** Pad Mini 잠금 실험은 서비스 중인 helper RPC나 Mika 앱/AI E2E를 실행하지 않았습니다. 모델이나 API key도 설정하지 않았습니다.
-- **복구는 별도 검증 항목입니다.** Wireless ADB가 사라진 뒤 사용자가 다시 켰지만 helper는 없었고 수동 재시작이 필요했습니다. 자동 복구와 기기 재부팅 후 동작은 검증하지 않았습니다.
+- **복구에 제한된 성공 결과가 추가됐습니다.** Mika 직접 페어링 후 잠금 해제/`Awake` 상태에서 Wireless debugging을 켜 둔 채 신원을 확인한 shell helper에 `TERM`을 보냈습니다. 약 5초 후 앱이 만든 새 helper를 관찰했고 구조 작업이나 수동 시작 없이 자체 점검 12/12를 41초에 통과했습니다. 이전 잠금 상태의 전송 단절/수동 복구 실패는 원인 미상으로 보존하며, 무선 디버깅을 끈 잠금 상태, 재부팅, 장시간 유휴와 네트워크 로밍은 미시험입니다.
 
 ## 실제로 시험한 범위
 
@@ -24,7 +24,7 @@
 | Samsung A32, Android 13 / One UI 5.1, root; Virtual Screen 0.2.1 Root 백엔드 | `ROOT_OPERATION_FAILED`; `SecurityException: packageName must match the calling uid` | 이 ROM/백엔드 조합의 결과이며 모든 root 구현에 대한 결론은 아님 |
 | 같은 A32; ADB로 시작한 Shizuku 13.6.0; Virtual Screen MCP | 도구 19개 나열, Settings 실행·노드 읽기·탭·입력 확인; 물리 화면 `DOZE_SUSPEND` | `keyguard showing=false`; 도구 19개를 모두 재시험한 것은 아님 |
 | 같은 A32; 첫 앱 자체 점검 | 18/19, Tap 실패 | 나중의 제한된 탭/입력 성공이 최초 실패를 지우지 않음 |
-| Xiaomi Pad Mini, Android 16, non-root; Mika 0.1.44, build `2b26f3f` | 자체 점검 12 pass, 0 partial, 0 fail, 0 skipped, 41초 | 잠금 해제 상태에서 수행 |
+| Xiaomi Pad Mini, Android 16, non-root; Mika 0.1.44, build `2b26f3f` | 자체 점검 모두 12 pass, 0 partial, 0 fail, 0 skipped: 기준 42초, 페어링 후 41초, 복구 후 41초 | 잠금 해제 상태; 복구는 `Awake` 및 Wireless debugging 활성 상태의 helper 종료만 시험 |
 | 같은 Pad Mini; 보안 잠금 및 화면 꺼짐 | 설치된 APK의 `ShellService`를 별도 임시 shell 프로세스로 실행하여 디스플레이 생성·노드 읽기·탭 카운터·입력 회독 확인 | `Asleep`, 물리 `OFF`, `showing=true`; 서비스 중인 helper RPC 또는 앱/AI E2E가 아님 |
 | 같은 Pad Mini; 보안 잠금; TikTok Studio 44.6.3 | 실제 앱 실행 및 1880×3008 프레임 캡처, 물리 화면은 꺼진 상태 유지 | 실행과 캡처만 수행, 게시나 계정 작업 없음 |
 
@@ -64,12 +64,16 @@ MCP는 인증을 유지하고 loopback에서만 제공하며, 선택한 기기�
 
 ## Pad Mini: 호환성과 복구를 분리
 
-Mika 0.1.44의 공식 `usb-start.sh`는 이미 승인된 ADB 채널로 실행할 수 있습니다.
-파일 이름이 USB 케이블 필수를 뜻하지는 않으며, 이 실행이 Mika 자체 무선 페어링 성공을 입증하지도 않습니다.
+Mika 0.1.44는 처음에 기존 승인된 ADB 채널에서 공식 컴퓨터 시작 스크립트 `usb-start.sh`를 사용했습니다.
+이후 Mika 자체 UI에서 직접 페어링하여 `Paired`/`Connected`를 관찰했습니다. Mac의 ADB 페어링과 Mika 자체 페어링은 여전히 별개입니다.
+`WRITE_SECURE_SETTINGS`와 Wi-Fi trust는 이미 있었고 두 복구 토글도 원래 켜져 있었습니다. 이번 직접 페어링은 누락된 전제 조건을 충족했으며 해당 권한이나 토글을 새로 켠 것이 아닙니다.
 첫 자체 점검은 알림 비활성화로 11 pass, 1 partial이었습니다. 알림을 켠 뒤 재실행하여 12/12를 얻었습니다.
 Accessibility, 알림, 배터리 제한 해제, 자동 시작, 최근 앱 고정은 환경 준비이지 helper 영구 실행 보장이 아닙니다.
 잠금 진단은 PIN/패턴을 입력하거나 물리 keyguard를 해제하지 않고 별도 화면의 네이티브 기능만 시험했습니다.
-Wireless ADB가 사라진 뒤에는 연결을 다시 켜도 helper 수동 시작이 필요했습니다. 자동 복구로 보고하면 안 됩니다.
+이전 잠금 세션에서 Wireless ADB가 사라지고 재연결 후에도 helper 수동 시작이 필요했던 실패는 보존하며, 원인은 아직 확인되지 않았습니다.
+이번에는 잠금 해제/`Awake` 상태와 Wireless debugging 활성 상태를 유지하고 신원을 확인한 shell helper에 `TERM`을 보냈습니다. 약 5초 후 앱이 만든 새 helper를 관찰했으며 구조 작업이나 수동 시작은 없었습니다.
+Mika 자체 복구 후 점검은 12 pass, 0 partial, 0 fail, 0 skipped, 41초였습니다. 기준 42초와 페어링 후 41초도 모두 12/12였습니다.
+무선 디버깅을 끈 잠금 상태, 재부팅, 장시간 유휴와 네트워크 로밍은 미시험이며 helper 단독 복구는 AI E2E 성공이 아닙니다. [Wireless debugging과 복구](docs/wireless-debugging.md)를 참고하세요.
 
 ## 권한과 수명 주기 규칙
 

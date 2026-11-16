@@ -68,6 +68,8 @@ Do not print or commit the script contents; generated launch material can contai
 
 Configure the relevant OEM background settings through their normal UI: battery restrictions, notifications, autostart and Recent-app retention. Record each setting actually checked rather than assuming an exemption guarantees survival.
 
+For Mika-owned wireless pairing and recovery, follow the [app UI procedure](wireless-debugging.md#mika-setup-used-on-the-non-root-pad-mini). A computer-started helper and paired Mac are not substitutes for Mika's own pairing. Verify the two recovery toggles and the installed app's permission status rather than assuming that defaults were applied.
+
 ## 4. Check while unlocked first
 
 Run the application's compatibility/self-check. On Mika, use its Recovery & repair / Compatibility self-check page, keep it visible and allow the test to finish. Do not simultaneously run a second UI test on the same device.

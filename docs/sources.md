@@ -44,6 +44,10 @@ Important counterexamples retained in this guide:
 2. VirtualScreen's first self-check was 18/19 with Tap failing. Later explicit bounded tap/type success supplements rather than replaces that result.
 3. Samsung screen-off success had keyguard false, so it was not a secure-lock test.
 4. Xiaomi secure-lock native-helper success did not exercise the serving helper RPC or the full Mika AI workflow.
-5. A lost wireless ADB connection was followed by an absent helper. Manual startup restored it; automatic recovery and reboot survival remain unverified in this experiment.
+5. A lost wireless ADB connection was followed by an absent helper. Manual startup restored it; that initial session did not demonstrate automatic recovery. A later awake helper-only interruption after Mika own pairing did recover automatically and pass the app self-check; wireless-off/locked and reboot recovery remain unverified.
 
 Do not publish raw screenshots, device serials, account identifiers, credentials, private host paths or unfiltered device dumps as evidence. Prefer a redacted version/state/outcome table with the tested boundary named explicitly.
+
+## Community reports and recovery implementation
+
+The [wireless-debugging guide](wireless-debugging.md) separately labels Chinese and English first-hand community reports, their contrary evidence and the newly observed awake helper-only recovery. Community posts are not platform contracts or universal compatibility proof. The guide links the pinned AOSP Android 16 debugging manager and Mika auto-on implementation for the underlying mechanism.

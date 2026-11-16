@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "observation_date": "2026-11-16",
+  "provenance": "Author-reported sanitized summary; private raw evidence not published",
+  "cases": [
+    {
+      "id": "samsung-root",
+      "device_family": "Samsung A32",
+      "android": 13,
+      "root_available": true,
+      "app": "Virtual Screen",
+      "version": "0.2.1",
+      "backend": "root",
+      "result": "failed",
+      "error": "SecurityException: packageName must match the calling uid"
+    },
+    {
+      "id": "samsung-shizuku",
+      "device_family": "Samsung A32",
+      "android": 13,
+      "backend": "Shizuku via ADB",
+      "uid_class": "shell",
+      "version": "13.6.0",
+      "physical_display": "DOZE_SUSPEND",
+      "secure_keyguard_showing": false,
+      "verified": [
+        "mcp_tools_list_19",
+        "settings_launch",
+        "node_reading",
+        "tap_state_delta",
+        "typed_text_readback",
+        "cleanup"
+      ],
+      "initial_self_check": {
+        "passed": 18,
+        "total": 19,
+        "failed_item": "Tap"
+      },
+      "not_tested": [
+        "secure_keyguard",
+        "all_19_tools_retest",
+        "reboot_recovery"
+      ]
+    },
+    {
+      "id": "xiaomi-app-self-check",
+      "device_family": "Xiaomi Pad Mini",
+      "android": 16,
+      "root_available": false,
+      "app": "Mika",
+      "version": "0.1.44",
+      "build": "2b26f3f",
+      "lock_state": "unlocked",
+      "first_run": {
+        "pass": 11,
+        "partial": 1,
+        "fail": 0,
+        "skipped": 0,
+        "partial_item": "notifications"
+      },
+      "final_run": {
+        "pass": 12,
+        "partial": 0,
+        "fail": 0,
+        "skipped": 0,
+        "seconds": 41
+      },
+      "model_configured": false
+    },
+    {
+      "id": "xiaomi-locked-native",
+      "device_family": "Xiaomi Pad Mini",
+      "android": 16,
+      "execution_path": "Installed Mika APK ShellService in disposable shell process",
+      "physical_display": "OFF",
+      "wakefulness": "Asleep",
+      "secure_keyguard_showing": true,
+      "verified": [
+        "virtual_display_creation",
+        "test_page_nodes",
+        "tap_counter_increment",
+        "typed_text_readback",
+        "cleanup"
+      ],
+      "serving_helper_rpc_tested": false,
+      "app_ai_e2e_tested": false
+    },
+    {
+      "id": "xiaomi-tiktok-capture",
+      "app": "TikTok Studio",
+      "version": "44.6.3",
+      "package": "com.ss.android.tt.creator",
+      "execution_path": "Standalone installed-APK native backend",
+      "dimensions": [
+        1880,
+        3008
+      ],
+      "physical_display": "OFF",
+      "secure_keyguard_showing": true,
+      "result": "launch_and_capture_passed",
+      "input_actions": 0,
+      "private_image_published": false
+    },
+    {
+      "id": "xiaomi-lifecycle",
+      "transport_disappeared": true,
+      "user_reenabled_wireless_adb": true,
+      "helper_present_at_reconnect": false,
+      "manual_script_restart_succeeded": true,
+      "cause_of_helper_exit": "not established",
+      "automatic_recovery_verified": false,
+      "reboot_tested": false
+    }
+  ]
+}

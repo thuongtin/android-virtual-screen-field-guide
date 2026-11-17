@@ -4,7 +4,13 @@
 
 Real-device field notes on controlling Android apps on a separate virtual display while the physical screen remains off. This is a **documentation and reproducibility guide**, not an Android agent, an APK distribution, or a claim that every app works under every lock state.
 
-**Observation date: 2026-11-16.** Versions below are the tested versions, not a promise that they are the newest releases. The published findings are author-reported, sanitized observations. Private device captures and raw logs are intentionally not included, so readers should reproduce the tests rather than treat the repository as independently auditable raw evidence.
+**Observation date: 2026-11-16 / 2026-11-17.** Versions below are the tested versions, not a promise that they are the newest releases. The published findings are author-reported, sanitized observations. Private device captures and raw logs are intentionally not included, so readers should reproduce the tests rather than treat the repository as independently auditable raw evidence.
+
+## A32 Android 13: new root-hosted route
+
+A separate controller bootstrapped as root UID0, then ran its helper as system UID1000 without Shizuku operations. Live nodes, clicks, Unicode input, capture, 90-second idle and owned-worker timeout cleanup passed while the physical panel remained in DOZE/DOZE_SUSPEND. Direct UID0 still fails package attribution. This is not a stock Root-button or serving-MCP fix; secure keyguard, long idle and reboot remain untested.
+
+[A32 root workflow and evidence boundaries (English)](docs/a32-root-android13.md)
 
 ## Pixel 10 Pro XL / Android 17 update
 

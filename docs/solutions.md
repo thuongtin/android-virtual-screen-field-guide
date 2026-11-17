@@ -2,22 +2,25 @@
 
 This guide records device-specific paths, not a universal Android compatibility claim:
 
-- **VirtualScreen v0.2.1 + Shizuku v13.6.0 started through ADB as shell** worked on the tested Samsung with the physical screen off. The Root backend failed on that same device.
+- **VirtualScreen v0.2.1 + Shizuku v13.6.0 started through ADB as shell** worked on the tested Samsung with the physical screen off. The original Root backend failed on that same device. A later [separate root-hosted controller](a32-root-android13.md) passed with a root bootstrap and runtime system UID1000; it is not the app-level Root backend or serving MCP.
 - **Mika v0.1.44 native shell service** created and controlled a separate display on a non-root Xiaomi while its physical display was off and secure keyguard was showing. That result came from a disposable process loading the installed APK's native helper code, not from Mika's serving-helper RPC or full AI workflow.
 
 - **Pixel 10 Pro XL / Android 17, non-root, VirtualScreen + ADB Shizuku** adds a bounded parallel-use result and conditional locked semantic input. See the [Pixel workflow](pixel-android17.md); locked coordinate input failed and wireless auto-enablement is explicitly excluded.
 
 Versions, primary references and provenance are in [sources.md](sources.md). References here are pinned where the upstream project permits it. No root installation, bootloader change or keyguard dismissal is part of this procedure.
 
-## 1. Understand the three identities
+## 1. Understand the four identities
 
 | Identity | What it means | What it does not establish |
 | --- | --- | --- |
 | Ordinary app UID | An installed application has its own sandbox and platform permissions. A public-API app can render its own virtual-display content; MediaProjection provides user-consented capture. | Installing an app or granting accessibility does not turn its process into shell or root, grant arbitrary trusted-display flags or authorize arbitrary cross-app input. |
 | ADB shell, UID 2000 | A system-defined identity available through an authorized ADB connection. Shizuku started with ADB and Mika's limited helper use this identity for supported system operations. | Shell is not UID 0 and is subject to permissions, package attribution, SELinux, Android version and OEM behavior. |
 | Root, UID 0 | A distinct execution identity made available by an existing root environment. Some applications implement a Root backend or use root only to start a less-privileged helper. | Root availability does not mean every Binder API call succeeds or has valid package/UID attribution. A root-started helper need not continue running as root. |
+| System UID 1000 after root bootstrap | The later A32 controller used root authorization to start a worker matching its system-context package attribution. | Runtime UID1000 is not UID0 or an ordinary app. It is not `system_server`; SELinux and API/version behavior still matter. This does not fix the original app's root registration path. |
 
-Shizuku's **Start via root** and **Start via wireless debugging / computer ADB** are different startup choices. For the Samsung case below, choose the **ADB startup route**, then confirm that Shizuku reports shell operation. A rooted device can still use ADB-started Shizuku. Do not silently substitute root startup because root is available. [Official Shizuku setup](https://shizuku.rikka.app/guide/setup/).
+Shizuku's **Start via root** and **Start via wireless debugging / computer ADB** are different startup choices. For the original Samsung Shizuku case below, choose the **ADB startup route**, then confirm that Shizuku reports shell operation. A rooted device can still use ADB-started Shizuku. Do not silently substitute root startup because root is available. [Official Shizuku setup](https://shizuku.rikka.app/guide/setup/).
+
+If root operation is explicitly required on the tested A32, use the [separate root-hosted architecture and its boundaries](a32-root-android13.md); do not silently substitute the Shizuku path.
 
 Mika documents a separate nuance: its root startup starts the same limited helper used by wireless or computer startup. Its optional root-command capability is a separate setting and is not required for this experiment. [Pinned Mika setup](https://github.com/wangzan101/Mika/blob/2b26f3f80937a320581dab66f16e6a7fda1799ce/docs/setup-guide.en.md#rooted-phone-start-it-with-root).
 
@@ -26,11 +29,12 @@ Mika documents a separate nuance: its root startup starts the same limited helpe
 | Need | Candidate | Required evidence before calling it working |
 | --- | --- | --- |
 | MCP agent controls a separate display | VirtualScreen + ADB-started Shizuku | Installed server handshake, tool discovery, session/display creation, fresh observation and a bounded input verified on that display |
+| Root-required A32 screen-off control | Root bootstrap -> system UID1000, separate controller | Root/runtime identity, live input readback, physical-panel state, bounded idle and identity-checked cleanup; not stock MCP or secure lock |
 | Non-root native display mechanism | Mika shell helper | Helper startup and identity, display creation, changing frame/tree and bounded input on a disposable test page |
 | Full Mika AI task | Mika app with its intended helper connection and model configuration | App-level RPC plus an actual completed task. Native-helper tests alone do not satisfy this row |
 | Ordinary consented screen sharing | MediaProjection | System consent and projection lifecycle; this is not a substitute for independent display input or locked-background execution |
 
-Neither solution guarantees protected-content capture, all apps launching on secondary displays, autonomous recovery or compatibility with every ROM. Test the actual boundary you need.
+None of these paths guarantees protected-content capture, all apps launching on secondary displays, autonomous recovery or compatibility with every ROM. Test the actual boundary you need.
 
 ## 3. VirtualScreen with ADB-started Shizuku
 

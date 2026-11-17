@@ -1,10 +1,12 @@
 # Observed results and evidence boundaries
 
+> A32 root update (2026-11-17): [root-bootstrap / system-UID controller](a32-root-android13.md). This is a separate screen-off path, not a stock Root-backend or secure-keyguard fix.
+
 > Pixel Android 17 update: see [the dedicated workflow and evidence boundaries](pixel-android17.md), including locked semantic input, parallel use, and the no-auto-wireless policy. Do not apply Xiaomi recovery settings to this Pixel workflow.
 
 [Guide](../README.en.md) · [Sources](sources.md)
 
-Date: **2026-11-16**. These are author-reported results from real devices. Raw screenshots, credentials, account details and identifying device/network data remain private. This document and [observations.json](../examples/observations.json) are sanitized summaries, not raw logs from which a third party can independently reproduce every assertion.
+Dates: **2026-11-16 and 2026-11-17**. These are author-reported results from real devices. Raw screenshots, credentials, account details and identifying device/network data remain private. This document and [observations.json](../examples/observations.json) are sanitized summaries, not raw logs from which a third party can independently reproduce every assertion.
 
 ## Terminology
 
@@ -16,6 +18,8 @@ Date: **2026-11-16**. These are author-reported results from real devices. Raw s
 
 ## Case A: rooted Samsung A32
 
+The later [root-hosted controller result](a32-root-android13.md) passed bounded screen-off tests using runtime UID1000 after root bootstrap. The original app-level Root failure below remains valid; the new route is not serving MCP.
+
 ### Environment
 
 - Samsung A32, Android 13, One UI 5.1.
@@ -24,7 +28,7 @@ Date: **2026-11-16**. These are author-reported results from real devices. Raw s
 - Installed APK hash matched the release's `SHA256SUMS`.
 - The app already had an app-specific root grant and a loopback MCP listener. Those were not redundantly recreated.
 
-### Root backend: failed
+### Original Root backend: failed; later separate controller passed
 
 Both the app-level operation and a direct diagnostic invocation of the installed APK's root display entry point produced:
 

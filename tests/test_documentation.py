@@ -43,5 +43,29 @@ class DocumentationTests(unittest.TestCase):
         self.assertFalse(parallel['app_restart_used'])
         self.assertIn('onTop=false', parallel['task_restore'])
 
+    def test_a32_root_localized_entrypoints(self):
+        for name in ('README.md', 'README.en.md', 'README.zh-CN.md', 'README.ko.md', 'README.ja.md'):
+            self.assertIn('(docs/a32-root-android13.md)', (ROOT / name).read_text())
+
+    def test_a32_root_boundaries(self):
+        cases = {c['id']: c for c in json.loads((ROOT / 'examples/observations.json').read_text())['cases']}
+        root = cases['a32-root-bootstrap-system-screen-off']
+        self.assertEqual(root['observed_on'], '2026-11-17')
+        self.assertEqual(root['bootstrap_uid'], 0)
+        self.assertEqual(root['runtime_uid'], 1000)
+        for field in ('shizuku_used_for_operations', 'stock_root_backend_fixed', 'serving_app_mcp_tested', 'secure_keyguard_tested', 'physical_panel_ON_observed'):
+            self.assertFalse(root[field], field)
+        self.assertTrue(root['uid0_only_baseline'].startswith('FAIL'))
+        self.assertEqual(root['helper_rpc_idle_test_seconds'], 90)
+        self.assertTrue(root['timeout_cleanup']['owned_display_absence_verified'])
+        self.assertEqual(root['final_cleanup']['selinux'], 'Enforcing')
+        self.assertEqual(root['final_cleanup']['owned_workers_remaining'], 0)
+        self.assertIn('arbitrary_apps', root['not_tested'])
+        self.assertIn('reboot_recovery', root['not_tested'])
+        text = (ROOT / 'docs/a32-root-android13.md').read_text()
+        self.assertIn('not a repair', text)
+        self.assertIn('not a complete app patch', text.replace('**', ''))
+        self.assertIsNone(re.search(r'\b[A-Z]{2}\d[A-Z]\d{2}[A-Z0-9]{5}\b', text))
+
 if __name__ == '__main__':
     unittest.main()

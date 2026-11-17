@@ -1,5 +1,7 @@
 # Reproduce in small, reversible stages
 
+> A32 root update (2026-11-17): [root-bootstrap / system-UID controller](a32-root-android13.md). This is a separate screen-off path, not a stock Root-backend or secure-keyguard fix.
+
 > Pixel Android 17 update: see [the dedicated workflow and evidence boundaries](pixel-android17.md), including locked semantic input, parallel use, and the no-auto-wireless policy. Do not apply Xiaomi recovery settings to this Pixel workflow.
 
 [Guide](../README.en.md) · [Solutions](solutions.md) · [Failure diagnosis](troubleshooting.md)

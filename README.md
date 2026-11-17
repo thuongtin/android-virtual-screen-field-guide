@@ -4,7 +4,13 @@
 
 Ghi chép thực nghiệm điều khiển ứng dụng Android trên **màn hình ảo riêng**, trong khi màn hình vật lý vẫn tắt. Đây là repo **tài liệu và hướng dẫn tái lập**, không phải một Android agent hoàn chỉnh hay nơi phân phối APK.
 
-**Ngày kiểm chứng: 16/11/2026.** Các phiên bản nêu dưới đây là bản đã thử, không mặc định là bản mới nhất. Kết quả được tác giả tổng hợp từ phiên chạy thật; ảnh và log riêng tư không được công khai. Người đọc cần tự tái lập, không coi các bảng tổng hợp trong repo là raw evidence có thể audit độc lập.
+**Ngày kiểm chứng: 16 và 17/11/2026.** Các phiên bản nêu dưới đây là bản đã thử, không mặc định là bản mới nhất. Kết quả được tác giả tổng hợp từ phiên chạy thật; ảnh và log riêng tư không được công khai. Người đọc cần tự tái lập, không coi các bảng tổng hợp trong repo là raw evidence có thể audit độc lập.
+
+## A32 Android 13: đường root mới
+
+Đã kiểm controller riêng khởi động bằng root UID 0 rồi chạy helper system UID 1000, không dùng Shizuku cho thao tác. Đọc node, bấm, nhập Unicode, chụp, chờ 90 giây và cleanup sau worker treo đều pass khi panel thật ở DOZE/DOZE_SUSPEND. Root UID 0 thuần vẫn lỗi package/UID. Đây không phải sửa nút Root hay serving MCP của app gốc; chưa kiểm PIN/pattern, idle dài hoặc reboot.
+
+[A32 root workflow and evidence boundaries (English)](docs/a32-root-android13.md)
 
 ## Pixel 10 Pro XL / Android 17: kết quả mới
 

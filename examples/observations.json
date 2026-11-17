@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "observation_date": "2026-11-16",
-  "provenance": "Author-reported sanitized summary; private raw evidence not published",
+  "provenance": "Author-reported sanitized summary; private raw evidence not published. Per-case observed_on dates take precedence over the legacy initial observation_date.",
   "cases": [
     {
       "id": "samsung-root",
@@ -12,7 +12,8 @@
       "version": "0.2.1",
       "backend": "root",
       "result": "failed",
-      "error": "SecurityException: packageName must match the calling uid"
+      "error": "SecurityException: packageName must match the calling uid",
+      "observed_on": "2026-11-16"
     },
     {
       "id": "samsung-shizuku",
@@ -40,7 +41,8 @@
         "secure_keyguard",
         "all_19_tools_retest",
         "reboot_recovery"
-      ]
+      ],
+      "observed_on": "2026-11-16"
     },
     {
       "id": "xiaomi-app-self-check",
@@ -65,7 +67,8 @@
         "skipped": 0,
         "seconds": 41
       },
-      "model_configured": false
+      "model_configured": false,
+      "observed_on": "2026-11-16"
     },
     {
       "id": "xiaomi-locked-native",
@@ -83,7 +86,8 @@
         "cleanup"
       ],
       "serving_helper_rpc_tested": false,
-      "app_ai_e2e_tested": false
+      "app_ai_e2e_tested": false,
+      "observed_on": "2026-11-16"
     },
     {
       "id": "xiaomi-tiktok-capture",
@@ -99,7 +103,8 @@
       "secure_keyguard_showing": true,
       "result": "launch_and_capture_passed",
       "input_actions": 0,
-      "private_image_published": false
+      "private_image_published": false,
+      "observed_on": "2026-11-16"
     },
     {
       "id": "xiaomi-lifecycle",
@@ -110,7 +115,8 @@
       "cause_of_helper_exit": "not established",
       "automatic_recovery_verified": false,
       "reboot_tested": false,
-      "phase": "initial_computer_start_before_mika_pairing"
+      "phase": "initial_computer_start_before_mika_pairing",
+      "observed_on": "2026-11-16"
     },
     {
       "id": "xiaomi-paired-helper-recovery",
@@ -152,7 +158,8 @@
         "long_idle",
         "wifi_roaming",
         "reboot_recovery"
-      ]
+      ],
+      "observed_on": "2026-11-16"
     },
     {
       "id": "pixel17-locked-serving-semantic",
@@ -179,7 +186,8 @@
         "roaming",
         "reboot_recovery",
         "model_autonomous_ai_workflow"
-      ]
+      ],
+      "observed_on": "2026-11-16"
     },
     {
       "id": "pixel17-unlocked-parallel-whatsapp",
@@ -206,7 +214,65 @@
         "all_apps",
         "zero_transient_focus_change",
         "model_autonomous_ai_workflow"
+      ],
+      "observed_on": "2026-11-16"
+    },
+    {
+      "id": "a32-root-bootstrap-system-screen-off",
+      "observed_on": "2026-11-17",
+      "device_family": "Samsung A32",
+      "android": 13,
+      "api_level": 33,
+      "root_environment": "existing Magisk 31.1",
+      "bootstrap_uid": 0,
+      "runtime_uid": 1000,
+      "shizuku_used_for_operations": false,
+      "engine": "unchanged installed VirtualScreen 0.2.1 APK",
+      "control_surface": "separate root-hosted controller over private process stdio",
+      "stock_root_backend_fixed": false,
+      "serving_app_mcp_tested": false,
+      "uid0_only_baseline": "FAIL: packageName must match the calling uid",
+      "physical_panel_states_observed": [
+        "DOZE",
+        "DOZE_SUSPEND"
+      ],
+      "physical_panel_ON_observed": false,
+      "global_interactive_during_session": true,
+      "device_secure": false,
+      "secure_keyguard_tested": false,
+      "probe_live_nodes": "PASS",
+      "probe_semantic_click": "PASS",
+      "probe_coordinate_tap": "PASS",
+      "probe_unicode_set_text": "PASS",
+      "capture": "PASS",
+      "helper_rpc_idle_test_seconds": 90,
+      "post_idle_input": "PASS",
+      "timeout_cleanup": {
+        "injection": "SIGSTOP of newly owned worker only",
+        "result": "PASS",
+        "elapsed_seconds_approx": 9.7,
+        "pid_identity_checked": true,
+        "owned_display_absence_verified": true
+      },
+      "disposable_source_rollback": "PASS: UID0 attribution failure reproduced; working helper retained",
+      "final_cleanup": {
+        "owned_workers_remaining": 0,
+        "owned_probe_tasks_remaining": 0,
+        "original_apk_unchanged": true,
+        "original_settings_restored": true,
+        "helper_dex_retained_for_explicit_reuse": true,
+        "selinux": "Enforcing"
+      },
+      "not_tested": [
+        "secure_PIN_or_pattern",
+        "arbitrary_apps",
+        "simultaneous_physical_screen_use",
+        "full_20_minute_idle_limit",
+        "overnight",
+        "reboot_recovery",
+        "model_autonomous_ai_workflow"
       ]
     }
-  ]
+  ],
+  "last_updated": "2026-11-17"
 }

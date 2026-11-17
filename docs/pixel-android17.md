@@ -32,7 +32,7 @@ The decisive route, reported by the [MoonClicker author on Pixel 7a/API 37](http
 4. Reject input unless the owned display is ON, the requested package matches the session, its virtual window has focus, and the physical device remains locked, secure and OFF. Use display-local coordinate bounds, not default-display input.
 5. Verify fresh nodes and uncached images after input. An acknowledged injection alone is insufficient.
 
-This is build-sensitive platform behavior. The original [technical research](https://github.com/kuomartin/MoonClicker/blob/main/docs/research/vd-display-group-android17.md) also distinguishes display state from power-group wakefulness. Do not change global desktop flags, power policy, keyguard or framework protections to force a pass.
+This is build-sensitive platform behavior. The original [technical research](https://github.com/kuomartin/MoonClicker/blob/564b49edc11400c31caa6d3f3a9597c953686d07/docs/research/vd-display-group-android17.md) also distinguishes display state from power-group wakefulness. Do not change global desktop flags, power policy, keyguard or framework protections to force a pass.
 
 ### What actually passed
 

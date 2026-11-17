@@ -23,12 +23,18 @@
 
 [Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
 
+## Xiaomi Pad Mini / Android 16：区分三类证据
+
+2026-11-17，非 root 的 Mika 0.1.44 在安全锁屏、物理显示屏 `OFF` 时，通过**应用自身 UI 调用现有 serving helper 完成自检**：12 pass、0 partial、0 fail、0 skipped，42 秒。独立 UI host 仅临时将 Mika task 移至虚拟显示屏并操作 UI，原应用/helper 进程保持不变。关闭显示屏前已将 task 恢复后台，APK/设置未变。这不同于先前解锁自检和独立原生 probe，仍不是模型 AI 端到端测试。
+
+另一锁屏、息屏会话通过已安装 Mika APK 的独立原生 host + UIAutomation，向用户自己的 Telegram Saved Messages 发送了**恰好一条**获授权测试消息，不经过 serving RPC 或 AI。发送前重新核对目的地和草稿，发送后确认 UI `Sent`/`Seen`、输入框为空，并将 task 恢复后台。Saved Messages 中的 `Seen` 不代表他人已读。物理状态和主 task 仅采样检查，未连续跟踪。英文详解：[Xiaomi 工作流](docs/xiaomi-pad-mini-android16.md)与[验收矩阵](docs/acceptance-matrix.md)。
+
 ## 核心结论
 
 - **Root 既非必要条件，也非充分条件。** 已 root 的 Samsung A32 在 Virtual Screen 的 Root 后端遇到 package/UID 错误；改用 ADB 启动、以 shell UID `2000` 运行的 Shizuku 后，限定测试通过。
-- **非 root 设备也有可行路径。** Xiaomi Pad Mini 的 Mika 解锁状态自检为 12/12；安全锁屏状态另有原生后端诊断成功。
+- **非 root 在安全锁屏时也有实测成功。** Mika 应用通过现有 serving helper 在物理 `OFF` 时自检 12/12，42 秒；先前解锁自检、独立 probe 和独立 Telegram 路径分别记录。
 - **熄屏不等于安全锁屏。** A32 的 `keyguard showing=false`，不能据此推断 PIN/图案锁下也能工作。
-- **后端成功不等于完整 agent 成功。** Pad Mini 锁屏实验没有调用正在服务的 helper RPC，也没有运行 Mika 应用或 AI 端到端任务。未配置模型或 API key。
+- **应用自检不等于模型 AI 端到端成功。** 新锁屏自检由 Mika UI 调用现有 serving helper；旧 probe 和 Telegram 使用独立原生路径，不调用 serving RPC。未配置模型或 API key，未测试完整 AI 任务。
 - **恢复已有新的限定成功结果。** Mika 直接配对后，在解锁/`Awake` 且 Wireless debugging 保持开启时，对核实身份的 shell helper 发送 `TERM`，约 5 秒后观察到应用创建新 helper，无需救援或手动启动；随后自检 12/12，41 秒。先前锁屏时传输消失、必须手动恢复的失败仍保留，原因未明；关闭 Wireless debugging 且锁屏、重启、长时间空闲及网络漫游仍未测试。
 
 ## 已验证的范围
@@ -38,9 +44,11 @@
 | Samsung A32，Android 13 / One UI 5.1，已 root；Virtual Screen 0.2.1 Root 后端 | `ROOT_OPERATION_FAILED`；`SecurityException: packageName must match the calling uid` | 仅代表本次 ROM/后端组合，不代表所有 root 实现 |
 | 同一 A32；ADB 启动 Shizuku 13.6.0；Virtual Screen MCP | 列出 19 个工具；Settings 启动、节点读取、点击和输入通过；物理显示为 `DOZE_SUSPEND` | `keyguard showing=false`；未重新逐个测试全部 19 个工具 |
 | 同一 A32；应用首次自检 | 18/19，Tap 失败 | 后续限定点击与输入成功不覆盖首次失败 |
-| Xiaomi Pad Mini，Android 16，非 root；Mika 0.1.44，build `2b26f3f` | 自检均为 12 pass、0 partial、0 fail、0 skipped：基线 42 秒、配对后 41 秒、恢复后 41 秒 | 解锁状态；恢复仅测试 `Awake` 且 Wireless debugging 开启时 helper 终止 |
-| 同一 Pad Mini；安全锁屏且熄屏 | 已安装 APK 的 `ShellService` 在独立临时 shell 进程中创建显示、读取节点、点击计数和输入回读成功 | `Asleep`、物理 `OFF`、`showing=true`；不是服务中 helper 的 RPC 或应用/AI E2E |
+| 历史解锁测试：Xiaomi Pad Mini，Android 16，非 root；Mika 0.1.44，build `2b26f3f` | 自检均为 12 pass、0 partial、0 fail、0 skipped：基线 42 秒、配对后 41 秒、恢复后 41 秒 | 解锁状态；恢复仅测试 `Awake` 且 Wireless debugging 开启时 helper 终止 |
+| 早期独立 probe：同一 Pad Mini；安全锁屏且熄屏 | 已安装 APK 的 `ShellService` 在独立临时 shell 进程中创建显示、读取节点、点击计数和输入回读成功 | `Asleep`、物理 `OFF`、`showing=true`；不是服务中 helper 的 RPC 或应用/AI E2E |
 | 同一 Pad Mini；安全锁屏；TikTok Studio 44.6.3 | 实际应用启动并捕获 1880×3008 图像；物理屏幕保持关闭 | 仅启动与截图，未发布内容或操作账号 |
+| 同一 Pad Mini；安全锁屏、物理 `OFF`；2026-11-17 | Mika UI 调用现有 serving helper：12 pass、0 partial、0 fail、0 skipped，42 秒 | 独立 UI host；原应用/helper 进程未变；不是模型 AI 端到端测试 |
+| 同一 Pad Mini；Telegram Saved Messages；锁屏、息屏；2026-11-17 | 恰好一条获授权消息；发送前核对目的地/草稿；UI `Sent`/`Seen`、输入框为空 | 独立原生 host + UIAutomation，不经过 serving RPC/AI；`Seen` 仅指个人 Saved Messages；task 已恢复后台 |
 
 完整历史见 [实验结果与边界](docs/observed-results.md)。[脱敏摘要](examples/observations.json)不是原始 trace。
 
@@ -58,16 +66,18 @@
 
 ## 三条控制路径不能混为一谈
 
-1. **Virtual Screen + MCP**：应用授权、session、控制 lease、最新 observation、操作、回读及清理。
-2. **Mika 正常应用流程**：自身 helper、Accessibility 服务、应用编排，以及可选的模型配置。
-3. **独立原生诊断**：临时 shell 进程加载已安装 Mika APK 中的 `ShellService`，验证设备与后端能力。
+1. **Virtual Screen + MCP**：应用授权、session、控制 lease、最新 observation、操作、回读；先按约定将 task 恢复后台，再关闭显示屏，释放本次 lease/session 和资源。
+2. **Mika 应用流程**：新锁屏自检由应用 UI 调用现有 serving helper，12/12、42 秒；独立 UI host 仅移动、捕获和点击 Mika task，未执行模型 AI 任务。
+3. **独立原生路径**：旧 probe 和 Telegram 使用已安装 Mika APK 的后端；Telegram 另用 UIAutomation，不调用 serving RPC。
 
 第三条路径没有验证 Mika 的应用编排或正在服务的 helper RPC，也没有提供生产远程控制端点。
 实验 harness 依赖具体版本，本仓库不将其作为通用 SDK 分发。
 虚拟屏幕、物理屏幕与 keyguard 的状态必须分别记录。
 设备级 `Awake` 可以与物理面板 `DOZE_SUSPEND` 同时出现，不能只看一个总状态。
 
-## A32 的经验：身份比“有无 root”更具体
+## A32 历史记录：原版 Root 失败与 shell Shizuku 回退
+
+本节记录原版 Root 后端失败及旧 Shizuku 回退，不是上文新的 root 启动、system UID `1000` 控制器；后者详见 [A32 root 指南](docs/a32-root-android13.md)。
 
 本实验开始前设备已 root；本指南不包含刷机、解锁 bootloader 或安装 root 的步骤。
 `su` 可用，但 Root 后端创建显示时被 package/UID 校验拒绝，具体上游缺陷未被定位。
@@ -83,7 +93,7 @@ Mika 0.1.44 最初通过现有授权 ADB 通道运行官方计算机启动脚本
 `WRITE_SECURE_SETTINGS` 和 Wi-Fi trust 原已具备，两个恢复开关也早已开启；本次直接配对满足了此前缺失的前提，并非新开启这些权限或开关。
 首次自检为 11 pass、1 partial，原因是通知关闭；开启通知后重新自检才达到 12/12。
 Accessibility、通知、电池不受限、自启动和最近任务锁定等准备不能保证 helper 永久存活。
-锁屏诊断未输入 PIN/图案，也未解除物理 keyguard；它仅验证独立显示的原生能力。
+早期独立锁屏诊断未输入 PIN/图案，也未解除物理 keyguard；其边界为原生能力，新应用自检另行记录。
 先前锁屏会话中 Wireless ADB 消失、恢复连接后 helper 仍需手动启动的失败保留，原因尚未确定。
 本次仅在解锁/`Awake` 且 Wireless debugging 保持开启时，核实 shell helper 身份后发送 `TERM`；约 5 秒后观察到应用自动创建新 helper，没有救援或手动启动。
 Mika 自身恢复后自检为 12 pass、0 partial、0 fail、0 skipped，41 秒；基线 42 秒和配对后 41 秒也均为 12/12。
@@ -98,7 +108,7 @@ Mika 自身恢复后自检为 12 pass、0 partial、0 fail、0 skipped，41 秒�
 - 输入前核对 display、task、focus 和新 observation；不确定是否送达时先回读，避免重复点击。
 - 不因应用已有其他显示屏上的 task 就强制停止或重启，避免丢失草稿；遵循工具确认流程。
 - 若测试经同意移动 task，先记录原位置与 focus，完成后恢复并验证；不要把 ROM 专属命令当作通用方案。
-- 结束时关闭本次显示、释放 lease/session、清理本次 forward，并复查物理屏幕与应用状态。
+- 先按约定将 task 恢复后台，再关闭本次显示屏、释放本次 lease/session 和资源，并复查物理屏幕与应用状态。源码回滚不会恢复手机状态，也不会撤回已发送消息。
 
 ## 建议复现顺序
 

@@ -20,12 +20,18 @@ The historical result remains: VirtualScreen + Shizuku shell passed locked/off s
 
 [Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
 
+## Xiaomi Pad Mini / Android 16: three distinct evidence paths
+
+On 2026-11-17, non-root Mika 0.1.44 completed **its own app self-check through the existing serving helper** while securely locked with the physical display `OFF`: 12 pass, 0 partial, 0 fail, 0 skipped in 42 seconds. A separate UI host only temporarily moved Mika's task to a virtual display and operated its UI; the original app/helper processes remained unchanged. The task returned to background before display release, with APK/settings unchanged. This extends the earlier unlocked checks and standalone native probe, but is not model-AI E2E.
+
+A separate locked/off test sent **exactly one** authorized message to the user's own Telegram Saved Messages through a standalone native host from the installed Mika APK + UIAutomation, not serving-helper RPC or AI. Fresh destination/draft readback preceded Send; the UI then showed `Sent`/`Seen`, an empty composer, and the task was restored to background. `Seen` in Saved Messages does not establish another person's read receipt. Physical state and main task were sampled, not continuously traced. Details: [Xiaomi workflow](docs/xiaomi-pad-mini-android16.md) and [acceptance matrix](docs/acceptance-matrix.md).
+
 ## The short answer
 
 - **Root is neither necessary nor sufficient.** On a rooted Samsung A32, Virtual Screen's Root backend failed a package/UID check. An ADB-started Shizuku server running as **shell UID 2000** worked.
-- **Non-root can work.** On a Xiaomi Pad Mini with Android 16, Mika's own unlocked-device self-check passed **12/12**. A separate diagnostic process using the installed APK's native backend also launched, read, tapped and typed on its virtual display while the physical device remained securely locked and off.
+- **Non-root can work while securely locked.** Mika's own app self-check now passed **12/12 in 42 seconds** through its existing serving helper with the physical display `OFF`. Earlier unlocked checks, the standalone probe and the standalone Telegram test remain distinct paths.
 - **Screen off is not the same as secure keyguard.** The A32 tests had no secure keyguard showing. Do not generalize them to PIN/pattern-locked Samsung devices.
-- **A working backend is not a complete AI-agent test.** The Xiaomi locked tests did not invoke the serving helper's RPC and did not run a complete Mika AI task. No model or API key was configured.
+- **App self-check is not model-AI E2E.** The new locked check exercised the existing serving helper via Mika's UI. The older probe and Telegram used standalone native paths, not serving-helper RPC. No model or API key was configured; no complete Mika AI task was tested.
 - **Recovery now has a bounded positive result.** After direct Mika pairing, an unlocked/`Awake` test kept Wireless debugging on, sent `TERM` to the identity-checked shell helper, and observed a new helper within about 5 seconds without rescue or manual startup. Mika then passed 12/12 in 41 seconds. The earlier locked transport-loss/manual-recovery failure remains unexplained; wireless-off while locked, reboot, long idle and roaming remain untested.
 
 ## What was actually tested
@@ -35,9 +41,11 @@ The historical result remains: VirtualScreen + Shizuku shell passed locked/off s
 | Samsung A32, Android 13 / One UI 5.1, rooted | Virtual Screen 0.2.1, Root backend | `ROOT_OPERATION_FAILED`: `SecurityException: packageName must match the calling uid` | This ROM/backend combination, not all root implementations |
 | Same A32, ADB-started Shizuku | Shizuku 13.6.0, Virtual Screen MCP | 19 tools listed; Settings launch, tree reading, tap and typing verified while physical display stayed `DOZE_SUSPEND` | No secure keyguard showing; not all 19 tools retested |
 | Same A32, app compatibility check | Virtual Screen 0.2.1 | Initial check: 18/19, with Tap failed | Later bounded tap/type success does not erase that earlier result |
-| Xiaomi Pad Mini, Android 16, non-root | Mika 0.1.44, build `2b26f3f` | Built-in self-check: 12 pass, 0 partial, 0 fail, 0 skipped; baseline 42 seconds, after pairing 41 seconds, after recovery 41 seconds | Unlocked; recovery tested only helper death while `Awake` with Wireless debugging on |
-| Same Xiaomi, securely locked and screen off | Installed Mika APK's `ShellService`, separate temporary shell process | Virtual display, test-page nodes, tap counter and typed-text readback passed; `Asleep`, physical `OFF`, keyguard `showing=true` | Native backend diagnostic, not serving-helper RPC or app/AI E2E |
+| Historical unlocked Xiaomi Pad Mini, Android 16, non-root | Mika 0.1.44, build `2b26f3f` | Built-in self-check: 12 pass, 0 partial, 0 fail, 0 skipped; baseline 42 seconds, after pairing 41 seconds, after recovery 41 seconds | Unlocked; recovery tested only helper death while `Awake` with Wireless debugging on |
+| Earlier standalone Xiaomi probe, securely locked and screen off | Installed Mika APK's `ShellService`, separate temporary shell process | Virtual display, test-page nodes, tap counter and typed-text readback passed; `Asleep`, physical `OFF`, keyguard `showing=true` | Native backend diagnostic, not serving-helper RPC or app/AI E2E |
 | Same Xiaomi, securely locked | Same native capture path; TikTok Studio 44.6.3 | App launched and a real 1880×3008 frame was captured; physical display remained off | Read-only launch/capture, no posting or account interaction |
+| Same Xiaomi, securely locked, physical `OFF`, 2026-11-17 | Mika app UI through existing serving helper | 12 pass, 0 partial, 0 fail, 0 skipped in 42 seconds | Separate UI host; original app/helper processes unchanged; not model-AI E2E |
+| Same Xiaomi, Telegram Saved Messages, locked/off, 2026-11-17 | Standalone installed-APK native host + UIAutomation | Exactly one authorized message; destination/draft checked before Send; UI `Sent`/`Seen`, empty composer | Not serving RPC or AI; `Seen` only in own Saved Messages; task restored to background |
 
 For methodology and unsuccessful attempts, see [Observed results](docs/observed-results.md). The [sanitized data](examples/observations.json) is a summary, not a raw trace.
 
@@ -70,9 +78,13 @@ flowchart LR
 
 These are **different control paths**, not interchangeable names:
 
-1. **Virtual Screen + MCP:** app-level authorization, session, control lease, current observation, action, readback and cleanup.
-2. **Mika's normal app workflow:** its own helper, accessibility service and optional model configuration.
-3. **Standalone native diagnostic:** a temporary shell process instantiated `ShellService` from the installed Mika APK. This established a device/backend capability; it did not establish Mika app-level orchestration or expose a production remote-control endpoint. The version-coupled experimental harness is not shipped here as a supported SDK.
+1. **Virtual Screen + MCP:** app-level authorization, session, control lease, current observation, action, readback, restore the agreed background task before closing the display, then release owned leases/sessions/resources.
+2. **Mika's app workflow:** the new locked/off app self-check used its existing serving helper and passed 12/12 in 42 seconds. A separate UI host only moved/captured/clicked Mika. No model-AI task was run.
+3. **Standalone native path:** the earlier probe and the Telegram test used the installed Mika APK's backend; Telegram added UIAutomation, not serving-helper RPC. This established a device/backend capability; it did not establish Mika app-level orchestration or expose a production remote-control endpoint. The version-coupled experimental harness is not shipped here as a supported SDK.
+
+## A32: historical stock Root failure and shell Shizuku fallback
+
+The stock Root backend failed package/UID attribution, while ADB-started shell UID `2000` Shizuku passed the bounded fallback tests. This is distinct from the newer root-bootstrapped system UID `1000` controller summarized above and documented in the [A32 root guide](docs/a32-root-android13.md); it does not fix the stock Root backend.
 
 ## Mika pairing and bounded recovery
 
@@ -91,7 +103,7 @@ The earlier locked-session transport disappearance and manual recovery remain pa
 - Inspect before input. Use a current observation and the correct display. If a tap's delivery is uncertain, read the state before deciding whether another action is needed.
 - Do not force-stop an app just because it already has a task on another display. A draft or other transient state may be lost. Observe the tool's approval flow.
 - Check **physical-display state**, virtual-display state and keyguard separately. Device-wide `Awake` can coexist with a physical panel in `DOZE_SUSPEND` because a virtual display is active.
-- Close test displays, release leases/sessions, restore any deliberately moved task/focus and verify the result. Keep successful configuration separate from disposable test cleanup.
+- Restore the agreed background task/focus before closing the test display, then release owned leases/sessions/resources and verify the result. Keep successful configuration separate from disposable test cleanup. Source rollback does not restore phone state or retract sent messages.
 
 ## Reproduce, then make claims
 

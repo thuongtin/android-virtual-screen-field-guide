@@ -75,3 +75,7 @@ The post-recovery self-check exercises the actual serving helper through Mika, u
 **Still untested:** wireless debugging off while securely locked, prolonged idle, Wi-Fi roaming and reboot recovery. A combined locked/wireless-off test was prepared but not run because an independent USB recovery transport was not available. Do not extrapolate the awake helper-only pass to those boundaries or claim that the original lifecycle failure's cause is fixed.
 
 For a deliberate failure-injection test, establish a working recovery channel first, verify exact helper identity immediately before any signal, record separate checkpoints and bound the observation window. A restored switch plus a new PID is only a candidate recovery until app-level behavior passes. Never signal a shared or unidentified process, revoke all clients' authorizations, or reboot as an incidental check.
+
+## What later locked-app results do not change
+
+The 2026-11-17 [Pad locked self-check and Telegram task](xiaomi-pad-mini-android16.md) used an already available ADB connection. They did not turn wireless debugging off, inject a helper failure, reboot or roam between networks. The newer 12/12 locked self-check therefore improves the app/helper compatibility evidence, not this guide's wireless-off recovery evidence. Keep the earlier awake helper-only recovery and its limitations separate.

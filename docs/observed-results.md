@@ -4,6 +4,8 @@
 
 > Pixel Android 17 update: see [the dedicated workflow and evidence boundaries](pixel-android17.md), including locked semantic input, parallel use, and the no-auto-wireless policy. Do not apply Xiaomi recovery settings to this Pixel workflow.
 
+> Xiaomi Android 16 update (2026-11-17): [locked serving-helper self-check and Telegram Saved Messages](xiaomi-pad-mini-android16.md). The new serving result supplements, rather than rewrites, the earlier native-only diagnostic.
+
 [Guide](../README.en.md) · [Sources](sources.md)
 
 Dates: **2026-11-16 and 2026-11-17**. These are author-reported results from real devices. Raw screenshots, credentials, account details and identifying device/network data remain private. This document and [observations.json](../examples/observations.json) are sanitized summaries, not raw logs from which a third party can independently reproduce every assertion.
@@ -129,7 +131,7 @@ The diagnostic verified:
 
 An early harness initialization used the wrong thread and failed. Another initial observation read a stale counter. The harness was corrected to initialize on the main Looper, wait for layout settling and refresh accessibility nodes. No app protection, test assertion or keyguard policy was disabled to obtain the final result.
 
-**Boundary:** this ran real native code on real hardware, but did not call the serving helper's RPC, rerun the app's self-check under lock or run an AI task through Mika. No unlock method was called.
+**Historical boundary (2026-11-16):** this diagnostic ran real native code on real hardware, but did not call the serving helper's RPC, rerun the app's self-check under lock or run an AI task through Mika. No unlock method was called. The separate 2026-11-17 serving-helper result below fills the self-check boundary, not the AI boundary.
 
 ### TikTok Studio launch and capture while locked
 
@@ -152,6 +154,19 @@ Mika was subsequently paired through its own setup UI, which reported **Paired**
 With the tablet **Awake/unlocked** and Wireless debugging **on**, a bounded test terminated only the identity-checked shell helper. A replacement helper was observed approximately **5 seconds** after the test began, with no manual startup or rescue. Mika's own post-recovery self-check passed **12/12 in 41 seconds**, exercising the actual serving helper rather than the earlier standalone native diagnostic. Baseline and immediate post-pairing self-checks also passed 12/12, in 42 and 41 seconds respectively.
 
 This does not resolve the earlier incident's cause or verify automatic recovery with wireless debugging off, while securely locked, after long idle/roaming or after reboot. The combined locked/wireless-off test was not run. See [the wireless-debugging guide and community reports](wireless-debugging.md).
+
+
+### Follow-up: locked self-check through the existing serving Binder, 2026-11-17
+
+The actual Mika Compatibility self-check reported **12 pass, 0 partial, 0 fail, 0 skipped in 42 seconds** while physical panel `OFF`, `interactive=false`, `locked=true`, `secure=true` at every sampled host response. It verified tap, ASCII/Chinese text, scroll, Back and 15 seconds of changing frames/tree. The app called its existing serving helper Binder; a separate native UI host only presented, observed and clicked Mika's actual UI. This is not the earlier standalone `new ShellService` diagnostic or an AI task.
+
+With explicit consent, only the existing background Mika task was temporarily moved. An initial API37-only task-method lookup failed on API36 before mutation; that failure remains recorded. The successful Android16 restore used WCT hide, move to the physical display, then one WCT containing reorder-to-bottom plus unhide. Task restoration was verified before owned-display release, with no unhide-at-top fallback, force-stop or app restart. Task-ID sets, app/helper PIDs, APK hash and compared settings were preserved; temporary workers/display/DEX were removed. Main top-task was unchanged at samples, not continuously traced. [Detailed flow and source references](xiaomi-pad-mini-android16.md#2-how-the-locked-self-check-reached-the-real-serving-helper).
+
+### Follow-up: one Telegram Saved Messages send, 2026-11-17
+
+A separate standalone installed-Mika native display host plus temporary UiAutomation sent **one requested message to the user's own Saved Messages** while physical OFF and secure-locked at sampled responses. This was **not serving-helper RPC or Mika AI**. Fresh semantic readback confirmed destination and exact draft before one guarded coordinate Send; fresh post-send UI showed `Sent` / `Seen` and an empty composer. `Seen` in Saved Messages does not imply another recipient read the message. The message body is not published.
+
+Initial `root=null` / target-not-visible reads caused no Send; a freshly observed composer-focus tap restored accessible nodes. Successful draft insertion/readback stayed on one accessibility connection. An initial polling-patch assertion/read failure was corrected with fail-fast build handling; no success was inferred from acknowledgement alone. Telegram was restored to its original background task before display close; temporary resources were removed and the sent message retained. Main top-task remained unchanged at samples, not continuously traced. [Detailed action and cleanup boundaries](xiaomi-pad-mini-android16.md#4-telegram-one-action-with-destination-and-draft-verification).
 
 ## Claims this guide deliberately does not make
 

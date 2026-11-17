@@ -4,7 +4,7 @@
 
 > Pixel Android 17 update: see [the dedicated workflow and evidence boundaries](pixel-android17.md), including locked semantic input, parallel use, and the no-auto-wireless policy. Do not apply Xiaomi recovery settings to this Pixel workflow.
 
-Accessed: **2026-11-16**. This is a tested-version field guide, not a claim that these are the newest releases. Repository tags were resolved through the public GitHub Git references API. Commit links below freeze source behavior; Android and Shizuku website pages are living documentation.
+Initial source review: **2026-11-16**; device follow-ups and selected source checks: **2026-11-17**. This is a tested-version field guide, not a claim that these are the newest releases. Repository tags were resolved through the public GitHub Git references API. Commit links below freeze source behavior; Android and Shizuku website pages are living documentation.
 
 ## Pinned projects
 
@@ -47,7 +47,7 @@ Important counterexamples retained in this guide:
 1. A rooted Samsung failed the Root backend while Shizuku started as shell worked. Root availability alone did not ensure this implementation's display creation succeeded.
 2. VirtualScreen's first self-check was 18/19 with Tap failing. Later explicit bounded tap/type success supplements rather than replaces that result.
 3. Samsung screen-off success had keyguard false, so it was not a secure-lock test.
-4. Xiaomi secure-lock native-helper success did not exercise the serving helper RPC or the full Mika AI workflow.
+4. The original Xiaomi secure-lock native-helper probe did not exercise serving RPC. A later locked app self-check did use the existing serving Binder, while the Telegram task used a standalone native host. Neither is a Mika model-AI E2E result.
 5. A lost wireless ADB connection was followed by an absent helper. Manual startup restored it; that initial session did not demonstrate automatic recovery. A later awake helper-only interruption after Mika own pairing did recover automatically and pass the app self-check; wireless-off/locked and reboot recovery remain unverified.
 
 Do not publish raw screenshots, device serials, account identifiers, credentials, private host paths or unfiltered device dumps as evidence. Prefer a redacted version/state/outcome table with the tested boundary named explicitly.
@@ -59,5 +59,12 @@ The [wireless-debugging guide](wireless-debugging.md) separately labels Chinese 
 ## Pixel 17 VirtualDeviceManager follow-up, 2026-11-17
 
 - [Original Chinese Pixel 7a/API 37 author report](https://github.com/kuomartin/MoonClicker/issues/124#issuecomment-6128968658): shell-owned APP_STREAMING association, VirtualDevice always-unlocked policy, trusted display without OWN_DISPLAY_GROUP and independent group. This is community device evidence, not a universal platform guarantee.
-- [Original technical investigation](https://github.com/kuomartin/MoonClicker/blob/main/docs/research/vd-display-group-android17.md): grouping paths, lifecycle and role side effects. This branch URL may change.
+- [Original technical investigation](https://github.com/kuomartin/MoonClicker/blob/564b49edc11400c31caa6d3f3a9597c953686d07/docs/research/vd-display-group-android17.md): grouping paths, lifecycle and role side effects. This link pins the original VirtualDevice-result research revision.
 - The guide owner's separate Pixel 10 Pro XL test adds coordinate-effect readback, native swipe, Unicode, Calculator, a bounded idle and cleanup evidence; it is not an independent public replay of the private artifacts. See [Pixel details](pixel-android17.md).
+
+## Pad Android16 serving-helper and task-restoration follow-up
+
+- [Pinned Mika ShellService](https://github.com/wangzan101/Mika/blob/2b26f3f80937a320581dab66f16e6a7fda1799ce/app/src/main/java/com/wangzan101/mika/cap/phone/shell/ShellService.kt): app-UID Binder guard, native display/input code and `keepBehind` restoration. The experiment used hidden/move plus grouped reorder/unhide, not the upstream unhide-only fallback.
+- [Android16 WindowOrganizerController](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android16-release/services/core/java/com/android/server/wm/WindowOrganizerController.java): transaction application under deferred layout. This is a moving platform branch, not a pinned OEM build; it explains the candidate mechanism, not continuous-focus proof on Xiaomi.
+- [Android Direct Boot](https://developer.android.com/privacy-and-security/direct-boot): credential-encrypted versus device-encrypted availability, first unlock and subsequent screen locking. The guide did not test before-first-unlock workflows or change storage encryption.
+- [Detailed Pad evidence](xiaomi-pad-mini-android16.md) distinguishes the authorized app's serving Binder, the standalone native UI host and the separate Telegram user workflow. The private raw experiment artifacts are not redistributed.

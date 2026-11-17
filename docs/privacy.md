@@ -31,3 +31,11 @@ Screenshots in a private support session are not automatically approved for publ
 5. Check that a code-copy rollback or native diagnostic is not being labeled as device rollback or app/AI E2E.
 
 Ignore rules are a convenience, not a secret scanner or an access-control boundary. If you discover an actual credential in history, handle it as a credential incident rather than merely adding an ignore pattern.
+
+## Saved Messages and self-check publication
+
+A self-chat is still private. It may contain passwords, pairing links, account identifiers or other notes unrelated to a test. For the Telegram case, retain only the requested test-message state, destination control, empty-composer check and lock/task restoration summary. Temporary full captures and unrelated node text were removed after verification. Do not publish the actual message body, existing notes, chat lists, screenshots, deep links or access codes to prove a generic input capability.
+
+The public case records use a generic test-message description. The observed `Sent`/`Seen` label is described as Telegram's self-chat UI state, not a remote person's acknowledgement. Draft preparation is not permission to send; an explicit send request covers that one verified action, not other chats or retries of uncertain delivery.
+
+Use per-run private directories with restrictive permissions for raw captures and receipts. Minimize retained evidence after checking the result. Keep identifiers, serials, paths and authentication material out of public fixtures, commit messages, review text and screenshots. Runtime receipts needed for recovery stay private; public documentation receives only redacted state transitions.

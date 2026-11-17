@@ -23,12 +23,18 @@
 
 [Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
 
+## Xiaomi Pad Mini / Android 16：三種類の証拠を区別
+
+2026-11-17、非 root の Mika 0.1.44 で、セキュアロック中かつ物理画面 `OFF` のまま、**アプリ自身の UI から既存の serving helper を使う自己診断**を実行しました。結果は 12 pass、0 partial、0 fail、0 skipped、42 秒でした。別の UI host は Mika task を一時的に仮想画面へ移して UI を操作するだけで、元のアプリ/helper プロセスは変わっていません。画面解放前に task をバックグラウンドへ戻し、APK/設定も維持しました。以前のロック解除中診断や独立ネイティブ probe とは異なり、モデル AI E2E ではありません。
+
+別のロック・消灯中テストでは、インストール済み Mika APK の独立ネイティブ host + UIAutomation により、ユーザー自身の Telegram Saved Messages へ承認済みテストメッセージを**ちょうど一件**送信しました。serving RPC や AI の経路ではありません。送信前に宛先と下書きを新たに読み戻し、送信後に UI の `Sent`/`Seen` と空の入力欄を確認し、task をバックグラウンドへ戻しました。Saved Messages の `Seen` は他人の既読を示しません。物理状態とメイン task はサンプリング確認であり連続追跡ではありません。英語の詳細：[Xiaomi の手順](docs/xiaomi-pad-mini-android16.md)、[受入基準マトリクス](docs/acceptance-matrix.md)。
+
 ## 要点
 
 - **Root は必要条件でも十分条件でもありません。** Root 済みの Samsung A32 では Virtual Screen の Root バックエンドが package/UID エラーで失敗しました。ADB から起動した shell UID `2000` の Shizuku では限定テストに成功しました。
-- **非 root でも動作する経路があります。** Xiaomi Pad Mini の Mika 自己診断はロック解除中に 12/12 を通過しました。セキュアロック中は別途ネイティブバックエンドを診断しました。
+- **非 root のセキュアロック中でも検証しました。** Mika アプリは既存の serving helper を使い、物理 `OFF` のまま自己診断 12/12、42 秒を達成しました。以前のロック解除中診断、独立 probe、独立 Telegram 経路は区別します。
 - **画面オフとセキュアロックは別です。** A32 は `keyguard showing=false` でした。PIN/パターンでロックされた状態への一般化はできません。
-- **バックエンドの成功は agent 全体の成功ではありません。** Pad Mini のロック中テストは稼働中 helper の RPC や Mika アプリ/AI の E2E を実行していません。モデルや API key も設定していません。
+- **アプリ自己診断はモデル AI E2E ではありません。** 新しいロック中診断は Mika UI から既存の serving helper を使用しました。以前の probe と Telegram は serving RPC ではなく独立ネイティブ経路です。モデル/API key は設定せず、完全な AI タスクは未検証です。
 - **復旧には新たな限定的成功があります。** Mika で直接ペアリング後、ロック解除/`Awake` で Wireless debugging を有効のまま、実行主体を確認した shell helper に `TERM` を送りました。約 5 秒でアプリによる新 helper の生成を観察し、救済操作や手動起動なしで自己診断 12/12、41 秒を達成しました。以前のロック中の接続消失・手動復旧の失敗は原因不明のまま残し、無線デバッグを無効にしたロック状態、再起動、長時間アイドル、ネットワークローミングは未試験です。
 
 ## 実際に検証した範囲
@@ -38,9 +44,11 @@
 | Samsung A32、Android 13 / One UI 5.1、root 済み；Virtual Screen 0.2.1 Root バックエンド | `ROOT_OPERATION_FAILED`；`SecurityException: packageName must match the calling uid` | この ROM/バックエンドの組み合わせの結果であり、すべての root 実装の結果ではない |
 | 同じ A32；ADB 起動の Shizuku 13.6.0；Virtual Screen MCP | 19 ツールを列挙；Settings 起動、ノード読取、タップ、文字入力を確認；物理画面は `DOZE_SUSPEND` | `keyguard showing=false`；19 ツールすべてを再試験したわけではない |
 | 同じ A32；アプリ初回自己診断 | 18/19、Tap が失敗 | 後続の限定タップ/入力成功で初回の失敗を上書きしない |
-| Xiaomi Pad Mini、Android 16、非 root；Mika 0.1.44、build `2b26f3f` | 自己診断はいずれも 12 pass、0 partial、0 fail、0 skipped：ベースライン 42 秒、ペアリング後 41 秒、復旧後 41 秒 | ロック解除中；復旧は `Awake`、Wireless debugging 有効時の helper 終了のみ検証 |
-| 同じ Pad Mini；セキュアロック中かつ画面オフ | インストール済み APK の `ShellService` を独立した一時 shell プロセスで使用；表示作成、ノード読取、タップカウンター、入力読戻しに成功 | `Asleep`、物理 `OFF`、`showing=true`；稼働中 helper の RPC やアプリ/AI E2E ではない |
+| 過去のロック解除中試験：Xiaomi Pad Mini、Android 16、非 root；Mika 0.1.44、build `2b26f3f` | 自己診断はいずれも 12 pass、0 partial、0 fail、0 skipped：ベースライン 42 秒、ペアリング後 41 秒、復旧後 41 秒 | ロック解除中；復旧は `Awake`、Wireless debugging 有効時の helper 終了のみ検証 |
+| 以前の独立 probe：同じ Pad Mini；セキュアロック中かつ画面オフ | インストール済み APK の `ShellService` を独立した一時 shell プロセスで使用；表示作成、ノード読取、タップカウンター、入力読戻しに成功 | `Asleep`、物理 `OFF`、`showing=true`；稼働中 helper の RPC やアプリ/AI E2E ではない |
 | 同じ Pad Mini；セキュアロック中；TikTok Studio 44.6.3 | 実アプリの起動と 1880×3008 フレームの取得に成功；物理画面はオフを維持 | 起動と取得のみ。投稿やアカウント操作は未実施 |
+| 同じ Pad Mini；セキュアロック中、物理 `OFF`；2026-11-17 | Mika UI と既存 serving helper：12 pass、0 partial、0 fail、0 skipped、42 秒 | 別 UI host；元のアプリ/helper プロセスを維持；モデル AI E2E ではない |
+| 同じ Pad Mini；Telegram Saved Messages；ロック・消灯中；2026-11-17 | 承認済みメッセージ一件；送信前に宛先/下書きを確認；UI `Sent`/`Seen`、入力欄は空 | 独立ネイティブ host + UIAutomation；serving RPC/AI ではない；`Seen` は自分の Saved Messages 内の状態；task を背景へ復元 |
 
 成功と失敗の詳細は[検証結果](docs/observed-results.md)を参照してください。[機密情報除去済みデータ](examples/observations.json)は生の trace ではありません。
 
@@ -58,16 +66,18 @@
 
 ## 混同してはいけない三つの制御経路
 
-1. **Virtual Screen + MCP**：アプリ承認、session、制御 lease、最新 observation、操作、読戻し、後片付けを扱います。
-2. **Mika の通常のアプリ経路**：専用 helper、Accessibility サービス、アプリ側の処理と任意のモデル設定を利用します。
-3. **独立したネイティブ診断**：一時 shell プロセスがインストール済み Mika APK の `ShellService` を読み込み、端末とバックエンドの能力を確認します。
+1. **Virtual Screen + MCP**：アプリ承認、session、制御 lease、最新 observation、操作と読戻しの後、合意した task をバックグラウンドへ戻してから画面を閉じ、当該セッションの lease/session とリソースを解放します。
+2. **Mika のアプリ経路**：新しいロック・消灯中の自己診断は既存の serving helper で 12/12、42 秒でした。別 UI host は Mika task の移動・取得・クリックのみを行い、モデル AI タスクは実行していません。
+3. **独立ネイティブ経路**：以前の probe と Telegram はインストール済み Mika APK のバックエンドを使用しました。Telegram は UIAutomation も使いますが serving RPC は使いません。
 
 三番目は Mika アプリ側の処理や、稼働中 helper の RPC を検証したものではありません。
 本番用リモート制御エンドポイントでもありません。バージョン依存の実験 harness は汎用 SDK として配布しません。
 物理画面、仮想画面、keyguard の状態は別々に記録します。
 仮想画面が有効なために端末全体が `Awake` でも、物理パネルは `DOZE_SUSPEND` の場合があります。
 
-## A32：root の有無だけで判断しない
+## A32 の過去の記録：標準 Root の失敗と shell Shizuku への切替
+
+本節は標準 Root バックエンドの失敗と以前の Shizuku 代替経路の記録です。冒頭の root 起動・system UID `1000` の新コントローラーとは別であり、新経路は [A32 root ガイド](docs/a32-root-android13.md)を参照してください。
 
 端末は実験開始前から root 済みでした。本ガイドに ROM 書込み、bootloader 解除、root 導入手順は含みません。
 `su` は動作しましたが、Root バックエンドの表示作成は package/UID 検査で拒否されました。上流の具体的な不具合箇所は特定していません。
@@ -83,7 +93,7 @@ Mika 0.1.44 は当初、既存の承認済み ADB 経路で公式のコンピュ
 `WRITE_SECURE_SETTINGS` と Wi-Fi trust はすでにあり、二つの復旧トグルも以前から有効でした。直接ペアリングで不足していた前提条件を満たしたのであり、これらの許可やトグルを新たに有効にしたわけではありません。
 最初の自己診断は通知無効により 11 pass、1 partial でした。通知を有効にして再実行し、12/12 になりました。
 Accessibility、通知、電池制限解除、自動起動、履歴画面での固定は準備であり、helper の永続稼働を保証しません。
-ロック中の診断では PIN/パターンを入力せず、物理 keyguard も解除せず、独立画面のネイティブ機能のみ確認しました。
+以前の独立ロック中診断では PIN/パターン入力や物理 keyguard 解除なしでネイティブ機能のみ確認し、新しいアプリ自己診断とは区別します。
 以前のロック中セッションで Wireless ADB が消失し、再接続後も helper の手動起動が必要だった失敗は残します。原因はまだ特定されていません。
 今回はロック解除/`Awake` かつ Wireless debugging を有効のまま、実行主体を確認した shell helper に `TERM` を送り、約 5 秒後にアプリが作成した新 helper を観察しました。救済操作や手動起動は行いませんでした。
 Mika 自身の復旧後診断は 12 pass、0 partial、0 fail、0 skipped、41 秒でした。ベースライン 42 秒とペアリング後 41 秒も 12/12 でした。
@@ -98,7 +108,7 @@ Mika 自身の復旧後診断は 12 pass、0 partial、0 fail、0 skipped、41 �
 - 入力前に display、task、focus と新しい observation を確認します。送達が不明なら再入力より先に状態を読みます。
 - 別画面に既存 task があるという理由だけで強制停止や再起動をしません。下書き消失を避け、ツールの確認フローを守ります。
 - 合意した試験で task を移動する場合は元の位置と focus を記録し、復元後に検証します。ROM 固有コマンドを汎用手順にしません。
-- 試験用画面を閉じ、lease/session と当該 forward を解放し、物理画面とアプリ状態を再確認します。
+- 合意した task をバックグラウンドへ戻してから試験用画面を閉じ、当該セッションの lease/session とリソースを解放し、状態を再確認します。ソースのロールバックでは端末状態は復元されず、送信済みメッセージも取り消されません。
 
 ## 再現の推奨順序
 

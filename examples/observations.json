@@ -324,6 +324,137 @@
         "model_autonomous_ai_workflow",
         "live_KILL_escalation"
       ]
+    },
+    {
+      "id": "xiaomi-locked-serving-self-check",
+      "observed_on": "2026-11-17",
+      "device_family": "Xiaomi Pad Mini",
+      "android": 16,
+      "api_level": 36,
+      "root_available": false,
+      "app": "Mika",
+      "version": "0.1.44",
+      "build": "2b26f3f",
+      "execution_path": "Installed Mika Compatibility self-check through the existing serving helper Binder; separate native UI host only presents and controls the app UI",
+      "runtimes": {
+        "app": "existing installed Mika app, app UID",
+        "serving_helper": "existing shell UID 2000 Binder service",
+        "ui_host": "separate disposable installed-APK native display host"
+      },
+      "physical_display": "OFF at every sampled host response",
+      "device_locked": true,
+      "device_secure": true,
+      "global_interactive": false,
+      "serving_helper_rpc_tested": true,
+      "app_ai_e2e_tested": false,
+      "self_check": {
+        "pass": 12,
+        "partial": 0,
+        "fail": 0,
+        "skipped": 0,
+        "seconds": 42,
+        "changing_frame_and_tree_seconds": 15
+      },
+      "input_evidence": {
+        "semantic": "App report verified ASCII and Chinese readback, expected test-page nodes",
+        "coordinate": "App report verified tap; native host selected actual self-check Start from fresh UI",
+        "other_actions": [
+          "scroll",
+          "Back"
+        ]
+      },
+      "main_task_unchanged_at_samples": true,
+      "continuous_physical_state_trace": false,
+      "initial_failure": "API37 moveRootTaskToDisplayOnTopOrBottom absent on API36; NoSuchMethodException before task movement; initial owned display cleaned",
+      "task_restore": "WCT setHidden true; moveRootTaskToDisplay to original physical display; one WCT reorder false plus setHidden false; verify background before display close",
+      "cleanup": {
+        "task_restored_background_before_display_close": true,
+        "task_id_set_unchanged": true,
+        "only_physical_display_remaining": true,
+        "app_and_serving_helper_pids_unchanged": true,
+        "apk_and_compared_settings_unchanged": true,
+        "temporary_native_workers_and_dex_removed": true,
+        "self_check_result_retained": true
+      },
+      "source_rollback": "Disposable source-copy rollback and rebuild passed; distinct from device restoration",
+      "not_tested": [
+        "model_AI_end_to_end",
+        "overnight_idle",
+        "reboot_recovery",
+        "roaming",
+        "live_failure_injection_lifecycle",
+        "continuous_focus_trace",
+        "arbitrary_apps",
+        "multiple_actors_in_one_task"
+      ]
+    },
+    {
+      "id": "xiaomi-locked-telegram-saved-message",
+      "observed_on": "2026-11-17",
+      "device_family": "Xiaomi Pad Mini",
+      "android": 16,
+      "api_level": 36,
+      "root_available": false,
+      "native_backend_app": "Mika",
+      "native_backend_version": "0.1.44",
+      "native_backend_build": "2b26f3f",
+      "target_app": "Telegram",
+      "target_app_version": "not recorded in this public summary",
+      "execution_path": "Standalone installed-Mika native display host plus temporary UiAutomation; not Mika serving-helper RPC and not AI",
+      "runtimes": {
+        "display_host": "disposable shell process using installed Mika native backend",
+        "observation_and_text": "temporary UiAutomation; successful draft action/readback on one accessibility connection",
+        "serving_helper": "existing helper retained, not the RPC path under test"
+      },
+      "serving_helper_rpc_tested": false,
+      "app_ai_e2e_tested": false,
+      "physical_display": "OFF at every sampled host response",
+      "device_locked": true,
+      "device_secure": true,
+      "global_interactive": false,
+      "destination": "user own Saved Messages",
+      "message_body_published": false,
+      "send_invocations": 1,
+      "send_retries": 0,
+      "input_evidence": {
+        "semantic": "Fresh Saved Messages header, exact requested draft, visible Send control and final empty composer",
+        "coordinate": "One guarded native tap on fresh Send bounds",
+        "post_action": "Fresh matching message entry with Sent / Seen UI state"
+      },
+      "seen_interpretation": "Telegram UI state in own Saved Messages, not another person read receipt",
+      "initial_failures": [
+        "Accessibility root null / TARGET_PACKAGE_NOT_VISIBLE; no Send attempted",
+        "Draft polling patch assertion and old read failed before confirmation"
+      ],
+      "recovery": [
+        "Fresh display-local composer-focus tap restored accessible nodes",
+        "Empty editor observed before insertion",
+        "Final text insertion and draft refresh on same accessibility connection",
+        "Build execution changed to fail fast"
+      ],
+      "main_task_unchanged_at_samples": true,
+      "continuous_physical_state_trace": false,
+      "cleanup": {
+        "task_restored_background_before_display_close": true,
+        "only_physical_display_remaining": true,
+        "temporary_native_process_and_two_dex_removed": true,
+        "existing_mika_app_and_helper_pids_unchanged": true,
+        "compared_settings_unchanged": true,
+        "sent_message_retained": true,
+        "composer_empty": true
+      },
+      "source_rollback": "Disposable source-copy rollback and rebuild passed; does not recall the sent message",
+      "not_tested": [
+        "Mika_serving_RPC_for_this_send",
+        "model_AI_end_to_end",
+        "delivery_to_another_recipient",
+        "continuous_focus_trace",
+        "overnight_idle",
+        "reboot_recovery",
+        "roaming",
+        "arbitrary_apps",
+        "production_lifecycle_recovery"
+      ]
     }
   ],
   "last_updated": "2026-11-17"

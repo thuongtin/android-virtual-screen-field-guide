@@ -54,3 +54,22 @@ State whether outputs came from source inspection, the actual installed app, an 
 ## Stop rather than guess
 
 Stop further input when the target display/app changes unexpectedly, the device is no longer identifiable, an input result is uncertain, a permission or restart decision appears, or a protected surface refuses capture. Inspect the relevant boundary and keep partial results. Do not repair a missing prerequisite by changing unrelated device security, account or network settings.
+
+## Newer locked-device findings
+
+| Symptom | What to inspect | Bounded response | What not to infer or do |
+| --- | --- | --- | --- |
+| Pixel coordinates accepted but no visible change | Actual display group, virtual power state, fresh counter/readback | Compare the historical power-override route with the separately tested [CDM/VDM path](pixel-android17.md) | Do not repeatedly tap or call an accepted RPC a success |
+| `moveRootTaskToDisplayOnTopOrBottom` missing on Pad | API level and method inventory before task mutation | Use the source-backed Android16 task restoration described in [Pad details](xiaomi-pad-mini-android16.md) | Do not move a task until its background restoration path is known |
+| Accessibility window exists but root is null | Current package/task/focus, fresh image and whether a mutation was already delivered | In the Telegram case, a display-local tap on the observed composer restored nodes; same-connection editor refresh verified the draft | Bounded observation failure is not permission to repeat Send or replay text blindly |
+| Process disappears during cleanup | Exact owned PID/UID/start-time identity and `/proc` absence | Treat verified process disappearance as absence, then continue owned-resource cleanup | Do not kill a reused PID or skip persistent association/role cleanup |
+| A closed display leaves an APP_STREAMING role | Baseline role/association inventory and exact ownership receipt | Remove only the owned association and verify original role holders | Do not remove another session's role/association or reset allocator counters |
+| App self-check passes but agent task has not run | Whether a model/provider was configured and an actual requested workflow completed | Label the result app/helper compatibility, not autonomous AI | No API key/model setup or external request was tested by the Pad self-check |
+
+### Messaging with uncertain delivery
+
+Stop input and inspect the conversation if the Send result is uncertain. Do not retry merely because a command timed out. Confirm destination and draft before Send, issue one action, then look for the exact new message and a cleared composer. Saved Messages `Sent`/`Seen` is a self-chat UI status, not evidence that another person read a message. Return the task to the agreed background state afterward; task cleanup does not undo a sent message.
+
+### Cleanup failures are not all equivalent
+
+If a source rollback succeeds, report only source restoration. If restoring a task fails, keep ownership records and do not close its display hoping that Android will place it correctly. On the Pad, the tested transaction grouped background reorder with unhide; an unhide-only fallback is intentionally excluded. If a role or another session's ownership is ambiguous, preserve it and report the unresolved state rather than broadly resetting system settings.

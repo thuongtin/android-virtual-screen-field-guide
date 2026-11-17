@@ -3,9 +3,10 @@
 This guide records device-specific paths, not a universal Android compatibility claim:
 
 - **VirtualScreen v0.2.1 + Shizuku v13.6.0 started through ADB as shell** worked on the tested Samsung with the physical screen off. The original Root backend failed on that same device. A later [separate root-hosted controller](a32-root-android13.md) passed with a root bootstrap and runtime system UID1000; it is not the app-level Root backend or serving MCP.
-- **Mika v0.1.44 native shell service** created and controlled a separate display on a non-root Xiaomi while its physical display was off and secure keyguard was showing. That result came from a disposable process loading the installed APK's native helper code, not from Mika's serving-helper RPC or full AI workflow.
+- **Mika v0.1.44 native shell service** created and controlled a separate display on a non-root Xiaomi while its physical display was off and secure keyguard was showing. That **earlier native-probe** result came from a disposable process loading the installed APK's native helper code, not from Mika's serving-helper RPC or full AI workflow.
 
-- **Pixel 10 Pro XL / Android 17, non-root, VirtualScreen + ADB Shizuku** adds a bounded parallel-use result and conditional locked semantic input. See the [Pixel workflow](pixel-android17.md); locked coordinate input failed and wireless auto-enablement is explicitly excluded.
+- **Pixel 10 Pro XL / Android 17:** the older serving-MCP power-override route passed locked semantic input but failed coordinate input. A later **separate non-root CDM/VirtualDeviceManager controller** passed locked coordinates, native swipe and bounded idle. These are different paths, not a stock-app repair. See [Pixel details](pixel-android17.md); automatic wireless activation remains excluded.
+- **Xiaomi follow-up on 2026-11-17:** the app self-check through the existing serving helper passed 12/12 while securely locked; a separate standalone-host Telegram Saved Messages workflow also completed. Do not call that Telegram run serving RPC or AI E2E. See [Pad details](xiaomi-pad-mini-android16.md) and the [acceptance matrix](acceptance-matrix.md).
 
 Versions, primary references and provenance are in [sources.md](sources.md). References here are pinned where the upstream project permits it. No root installation, bootloader change or keyguard dismissal is part of this procedure.
 
@@ -31,6 +32,9 @@ Mika documents a separate nuance: its root startup starts the same limited helpe
 | MCP agent controls a separate display | VirtualScreen + ADB-started Shizuku | Installed server handshake, tool discovery, session/display creation, fresh observation and a bounded input verified on that display |
 | Root-required A32 screen-off control | Root bootstrap -> system UID1000, separate controller | Root/runtime identity, live input readback, physical-panel state, bounded idle and identity-checked cleanup; not stock MCP or secure lock |
 | Non-root native display mechanism | Mika shell helper | Helper startup and identity, display creation, changing frame/tree and bounded input on a disposable test page |
+| Locked Mika app/helper compatibility | Official app self-check, with its existing serving Binder | 12/12 on the tested Pad while physical OFF/securely locked, plus unchanged helper and cleanup; not model E2E |
+| Locked Pad app action | Standalone native host with explicit task ownership | Exact target/draft/action/readback and restore-before-close; Telegram self-message tested, not all apps |
+| Locked Pixel coordinates | Owned APP_STREAMING association + custom VirtualDeviceManager controller | Independent group, fresh coordinate effect, lock-state checks, association/role restoration; not stock serving MCP |
 | Full Mika AI task | Mika app with its intended helper connection and model configuration | App-level RPC plus an actual completed task. Native-helper tests alone do not satisfy this row |
 | Ordinary consented screen sharing | MediaProjection | System consent and projection lifecycle; this is not a substitute for independent display input or locked-background execution |
 
@@ -158,3 +162,11 @@ A useful final report states version/build, backend and identity, physical and v
 ## 8. Wireless-debugging recovery follow-up
 
 See [Wireless debugging: auto-off, reconnection and helper recovery](wireless-debugging.md) for Chinese/English community reports, the normal Mika pairing procedure, the bounded awake recovery result and the remaining untested boundaries.
+
+## Cross-device rules that must not be generalized
+
+- **Startup identity:** A32 root bootstrap/runtime UID1000, ADB-started Shizuku UID2000 and Mika shell UID2000 are different routes. Root on one device does not authorize root changes on another.
+- **Task APIs:** the Pixel API37 bottom-restoration method was absent on the tested Pad API36. The Pad used a verified WCT hidden/move/reorder/unhide sequence, never an unhide-at-top fallback. Inspect the actual runtime before moving a user task.
+- **Binder ownership:** Mika's serving interface authenticates the app UID. A standalone native diagnostic is not a client authorized to reuse that Binder. Do not bypass the guard or casually bind/unbind a connection that releases other sessions.
+- **Wireless policy:** the Pad's separately approved recovery configuration is not the Pixel policy. The Pixel work explicitly excludes automatically enabling wireless debugging or Shizuku boot startup.
+- **Storage/lock boundary:** none of these tests proves before-first-unlock operation after reboot. See the [lock and proof definitions](acceptance-matrix.md#lock-state-is-not-a-single-boolean).

@@ -17,7 +17,9 @@
 
 ## Pixel 10 Pro XL / Android 17 の更新
 
-root なしの VirtualScreen + Shizuku shell で、ロック・画面消灯中のテスト画面に対する意味的クリックとテキスト設定を検証しました。実験的なディスプレイ単位の電源オーバーライドが必要で、ロック中の座標タップは依然として失敗しています。ロック解除中は、ユーザーの承認を得て仮想画面で WhatsApp の閲覧と送信を行い、サンプリング確認では TikTok が実画面の前面に残りました。その後 WhatsApp をバックグラウンドへ戻しました。ワイヤレスデバッグは自動で有効にしません。すべてのアプリや瞬間的なフォーカス変化の防止は保証しません。
+2026-11-17 の新結果：CompanionDeviceManager（CDM）の `APP_STREAMING` + `VirtualDeviceManager` を使う独自コントローラーを、非 root の shell UID `2000` で実行しました。`OWN_DISPLAY_GROUP` フラグを使わず、セキュアロック中かつ物理画面 `OFF` の状態で座標タップ、ネイティブスワイプ、Unicode 入力、Calculator の結果 56 を確認しました。helper 呼出しなしで 308.7 秒アイドル後も座標タップでカウンターが `1 → 2` に変化しました。物理状態はサンプリング確認であり連続監視ではありません。標準 MCP/Shizuku の統合ではなく、ワイヤレスデバッグも自動で有効にしていません。後片付けでは association/role と設定を復元し、セッション所有のリソースを削除しました。
+
+以前の結果も残します。VirtualScreen + Shizuku shell は実験的なディスプレイ単位の電源オーバーライドによりロック・消灯中の意味的クリックとテキスト設定に成功しましたが、その試験では座標タップが失敗しました。承認済み WhatsApp の閲覧・送信はロック解除中のみ検証し、仮想画面での実行中、サンプリング確認では TikTok が物理画面の前面に残り、その後 WhatsApp をバックグラウンドへ戻しました。ロック中の WhatsApp、全アプリ対応、瞬間的なフォーカス変化の防止、再起動や通信断後の復旧は立証していません。
 
 [Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
 

@@ -67,5 +67,23 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn('not a complete app patch', text.replace('**', ''))
         self.assertIsNone(re.search(r'\b[A-Z]{2}\d[A-Z]\d{2}[A-Z0-9]{5}\b', text))
 
+    def test_pixel_vdm_boundaries(self):
+        cases = {c['id']: c for c in json.loads((ROOT / 'examples/observations.json').read_text())['cases']}
+        vdm = cases['pixel17-locked-vdm-app-streaming']
+        self.assertEqual(vdm['runtime_uid'], 2000)
+        self.assertTrue(vdm['device_locked'] and vdm['device_secure'])
+        for field in ('root_available', 'shizuku_used', 'serving_mcp_tested', 'stock_app_patched', 'own_display_group_flag_requested', 'wireless_settings_changed', 'continuous_physical_state_trace'):
+            self.assertFalse(vdm[field], field)
+        self.assertTrue(vdm['independent_device_display_group_verified'])
+        self.assertEqual(vdm['helper_rpc_idle_test_seconds'], 308.7)
+        self.assertEqual(vdm['controller_unit_tests_passed'], 13)
+        self.assertTrue(all(vdm['final_cleanup'].values()))
+        self.assertIn('overnight_idle', vdm['not_tested'])
+        self.assertIn('NOT PASS', vdm['earlier_idle_attempt'])
+        self.assertTrue(cases['pixel17-locked-serving-semantic']['probe_coordinate_tap'].startswith('FAIL'))
+        guide = (ROOT / 'docs/pixel-android17.md').read_text()
+        self.assertIn('persistent companion role', guide)
+        self.assertIn('308.7', guide)
+
 if __name__ == '__main__':
     unittest.main()

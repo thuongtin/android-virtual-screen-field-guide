@@ -17,7 +17,9 @@
 
 ## Pixel 10 Pro XL / Android 17 更新
 
-无 root 的 VirtualScreen + Shizuku shell 通过了锁屏、息屏状态下测试页面的语义点击和文本设置，需要实验性的单显示器电源覆盖；锁屏坐标点击仍然失败。解锁时，经用户授权在虚拟显示器读取和发送 WhatsApp 消息，采样检查中 TikTok 仍在主屏前台，之后 WhatsApp 回到后台。不自动开启无线调试；不保证所有应用或完全没有瞬时焦点变化。
+2026-11-17 新结果：自定义控制器采用 CompanionDeviceManager（CDM）`APP_STREAMING` + `VirtualDeviceManager`，以非 root 的 shell UID `2000` 运行，不使用 `OWN_DISPLAY_GROUP` 标志。在安全锁屏且物理显示屏为 `OFF` 时，坐标点击、原生滑动、Unicode 输入及 Calculator 结果 56 均通过。无 helper 调用空闲 308.7 秒后，坐标点击仍使计数器 `1 → 2`；物理状态仅采样检查，未连续监控。这不是原版 MCP/Shizuku 集成，也未自动开启无线调试。清理已恢复 association/role 和设置，并移除本次会话拥有的资源。
+
+保留历史结果：VirtualScreen + Shizuku shell 借助实验性单显示屏电源覆盖，在锁屏、息屏时通过语义点击和文本设置，但当时坐标点击失败。获授权的 WhatsApp 读取和发送仅在解锁时验证：虚拟显示屏运行 WhatsApp，采样检查中 TikTok 保持物理屏前台，之后将 WhatsApp 恢复后台。不能据此断言 WhatsApp 在锁屏时可用、所有应用均支持、完全无瞬时焦点变化，或重启/断网后可恢复。
 
 [Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
 

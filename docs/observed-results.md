@@ -163,3 +163,7 @@ This does not resolve the earlier incident's cause or verify automatic recovery 
 - A screenshot proves a save/upload/post was accepted by a server.
 - A code-copy rollback restores a phone's configuration or account state.
 - Private raw evidence is publicly available for independent audit.
+
+## Pixel follow-up: independent VirtualDevice group while securely locked
+
+On 2026-11-17, a non-root custom shell controller using an owned APP_STREAMING association and VirtualDeviceManager passed coordinate tapping, native swiping, Unicode text, Calculator preview56 and a 308.7-second no-helper-traffic idle followed by verified input. The physical panel was OFF and deviceLocked/deviceSecure true at the relevant checks. This is a new route, **not** the older serving-MCP power override: its historical coordinate failure remains recorded. Association/role and temporary resource cleanup were verified, including a clean recreate. See [the detailed Pixel guide](pixel-android17.md#new-result-securely-locked-coordinate-control-through-virtualdevicemanager) for side effects, the rejected idle attempt, cleanup race fix, sources and untested boundaries.

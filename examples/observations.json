@@ -272,6 +272,58 @@
         "reboot_recovery",
         "model_autonomous_ai_workflow"
       ]
+    },
+    {
+      "id": "pixel17-locked-vdm-app-streaming",
+      "observed_on": "2026-11-17",
+      "device_family": "Pixel 10 Pro XL",
+      "android": 17,
+      "api_level": 37,
+      "root_available": false,
+      "runtime_uid": 2000,
+      "control_surface": "custom shell controller; CompanionDeviceManager APP_STREAMING + VirtualDeviceManager",
+      "shizuku_used": false,
+      "serving_mcp_tested": false,
+      "stock_app_patched": false,
+      "virtual_lock_policy": "LOCK_STATE_ALWAYS_UNLOCKED for virtual device only",
+      "own_display_group_flag_requested": false,
+      "independent_device_display_group_verified": true,
+      "physical_display": "OFF at relevant checks",
+      "device_locked": true,
+      "device_secure": true,
+      "global_interactive": false,
+      "coordinate_tap": "PASS: fresh counter delta",
+      "unicode_semantic_text": "PASS: Vietnamese and Chinese readback",
+      "native_swipe": "PASS: visible list changed",
+      "calculator": "PASS: 7×8 preview56; expression cleared; no equals/history write",
+      "helper_rpc_idle_test_seconds": 308.7,
+      "post_idle_input": "PASS: counter1 to2",
+      "continuous_physical_state_trace": false,
+      "earlier_idle_attempt": "NOT PASS: physical ON with interactive false; input guard rejected",
+      "negative_guards": [
+        "session_package_mismatch",
+        "coordinate_out_of_bounds"
+      ],
+      "wireless_settings_changed": false,
+      "controller_unit_tests_passed": 13,
+      "cleanup_race": "reproduced; fixed; receipt recovery and final cold lifecycle passed",
+      "final_cleanup": {
+        "original_associations_restored": true,
+        "original_role_holders_restored": true,
+        "original_settings_restored": true,
+        "owned_displays_worker_forward_dex_removed": true
+      },
+      "not_tested": [
+        "serving_mcp_integration",
+        "arbitrary_apps",
+        "overnight_idle",
+        "reboot_recovery",
+        "roaming",
+        "IME_Back",
+        "protected_content_capture",
+        "model_autonomous_ai_workflow",
+        "live_KILL_escalation"
+      ]
     }
   ],
   "last_updated": "2026-11-17"

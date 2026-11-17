@@ -55,3 +55,9 @@ Do not publish raw screenshots, device serials, account identifiers, credentials
 ## Community reports and recovery implementation
 
 The [wireless-debugging guide](wireless-debugging.md) separately labels Chinese and English first-hand community reports, their contrary evidence and the newly observed awake helper-only recovery. Community posts are not platform contracts or universal compatibility proof. The guide links the pinned AOSP Android 16 debugging manager and Mika auto-on implementation for the underlying mechanism.
+
+## Pixel 17 VirtualDeviceManager follow-up, 2026-11-17
+
+- [Original Chinese Pixel 7a/API 37 author report](https://github.com/kuomartin/MoonClicker/issues/124#issuecomment-6128968658): shell-owned APP_STREAMING association, VirtualDevice always-unlocked policy, trusted display without OWN_DISPLAY_GROUP and independent group. This is community device evidence, not a universal platform guarantee.
+- [Original technical investigation](https://github.com/kuomartin/MoonClicker/blob/main/docs/research/vd-display-group-android17.md): grouping paths, lifecycle and role side effects. This branch URL may change.
+- The guide owner's separate Pixel 10 Pro XL test adds coordinate-effect readback, native swipe, Unicode, Calculator, a bounded idle and cleanup evidence; it is not an independent public replay of the private artifacts. See [Pixel details](pixel-android17.md).

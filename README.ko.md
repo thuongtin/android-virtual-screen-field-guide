@@ -17,7 +17,9 @@
 
 ## Pixel 10 Pro XL / Android 17 업데이트
 
-루트 없이 VirtualScreen + Shizuku shell로 잠금 및 화면 꺼짐 상태의 테스트 페이지에서 시맨틱 클릭과 텍스트 설정을 검증했습니다. 실험적인 개별 디스플레이 전원 재정의가 필요하며, 잠금 상태의 좌표 탭은 여전히 실패했습니다. 잠금 해제 상태에서 사용자 승인에 따라 가상 화면으로 WhatsApp 메시지를 읽고 전송했으며, 표본 확인 시 TikTok은 실제 화면 전경을 유지했습니다. 이후 WhatsApp을 백그라운드로 복원했습니다. 무선 디버깅을 자동으로 켜지 않으며 모든 앱이나 순간적인 포커스 변화 방지를 보장하지 않습니다.
+2026-11-17 새 결과: CompanionDeviceManager(CDM) `APP_STREAMING` + `VirtualDeviceManager`를 사용하는 맞춤형 컨트롤러를 non-root shell UID `2000`으로 실행했습니다. `OWN_DISPLAY_GROUP` 플래그 없이 보안 잠금 및 물리 화면 `OFF` 상태에서 좌표 탭, 네이티브 스와이프, Unicode 입력과 Calculator 결과 56을 확인했습니다. helper 호출 없이 308.7초 대기한 뒤에도 좌표 탭으로 카운터가 `1 → 2`로 바뀌었습니다. 물리 상태는 표본 확인했으며 연속 감시하지 않았습니다. 기존 MCP/Shizuku 통합이 아니며 무선 디버깅을 자동으로 켜지 않았습니다. 정리 후 association/role과 설정을 복원하고 세션 소유 리소스를 제거했습니다.
+
+이전 결과도 보존합니다. VirtualScreen + Shizuku shell은 실험적인 개별 디스플레이 전원 재정의로 잠금/화면 꺼짐 상태에서 시맨틱 클릭과 텍스트 설정을 통과했지만 당시 좌표 탭은 실패했습니다. 승인된 WhatsApp 읽기/전송은 잠금 해제 상태에서만 시험했습니다. 가상 화면에서 동작하는 동안 표본 확인 시 TikTok은 물리 화면 전경을 유지했고, 이후 WhatsApp을 백그라운드로 복원했습니다. 잠금 상태의 WhatsApp, 모든 앱 지원, 순간적인 포커스 변화 방지 또는 재부팅/네트워크 단절 후 복구를 입증하지 않습니다.
 
 [Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
 

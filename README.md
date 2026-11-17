@@ -14,7 +14,9 @@ Ghi chép thực nghiệm điều khiển ứng dụng Android trên **màn hìn
 
 ## Pixel 10 Pro XL / Android 17: kết quả mới
 
-Non-root với VirtualScreen + Shizuku shell: đã kiểm MCP semantic click/set-text trên probe khi máy khóa/tắt, qua workaround nguồn riêng cho display. Coordinate tap lúc khóa vẫn FAIL. Khi mở khóa, đã đọc/gửi tin theo yêu cầu trên WhatsApp ở màn hình ảo trong khi TikTok vẫn foreground ở các lần kiểm, rồi trả WhatsApp về nền. Không tự bật Wireless debugging; chưa bảo đảm mọi app hoặc không giành focus thoáng qua.
+Kết quả mới ngày 2026-11-17: controller tùy biến dùng CompanionDeviceManager (CDM) `APP_STREAMING` + `VirtualDeviceManager`, non-root với shell UID `2000`, không dùng cờ `OWN_DISPLAY_GROUP`, đã kiểm coordinate tap, native swipe, nhập Unicode và Calculator cho kết quả 56 khi máy khóa bảo mật, vật lý `OFF`. Sau 308,7 giây idle không gọi helper, coordinate tap vẫn đổi counter `1 → 2`; trạng thái vật lý được lấy mẫu, không giám sát liên tục. Đây không phải stock MCP/Shizuku; không tự bật Wireless debugging. Cleanup đã khôi phục association/role và settings, dọn tài nguyên của phiên.
+
+Kết quả cũ vẫn được giữ: VirtualScreen + Shizuku shell qua workaround nguồn riêng cho display đã qua semantic click/set-text khi khóa/tắt, nhưng coordinate tap lúc đó FAIL. Phiên WhatsApp đọc/gửi theo yêu cầu chỉ được kiểm khi mở khóa, trên màn hình ảo trong khi TikTok vẫn foreground ở các lần lấy mẫu, rồi trả WhatsApp về nền. Không suy thành WhatsApp chạy khi khóa, mọi app đều hỗ trợ, không giành focus thoáng qua, hoặc tự phục hồi sau reboot/mất mạng.
 
 [Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
 

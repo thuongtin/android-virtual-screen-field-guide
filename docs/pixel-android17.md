@@ -2,9 +2,9 @@
 
 [English guide](../README.en.md) | [Results](observed-results.md) | [Privacy](privacy.md)
 
-Updated 2026-11-17. These are sanitized author-reported results from tests on 2026-11-16, not a universal compatibility guarantee. No private conversation, recipient, device identity, screenshot or credential is published.
+Updated 2026-11-17. These are sanitized author-reported results from tests on 2026-11-16 and 2026-11-17, not a universal compatibility guarantee. No private conversation, recipient, device identity, screenshot or credential is published.
 
-## Setup and root/non-root boundary
+## Historical VirtualScreen setup and root/non-root boundary
 
 - Pixel 10 Pro XL, Android 17 / API 37, non-root.
 - VirtualScreen `io.github.lejw0925.virtualscreen` v0.2.1, Shizuku v13.6.0 started through authorized ADB as **shell UID 2000**, not root.
@@ -20,20 +20,59 @@ Shizuku **Start on boot was kept OFF** through its own settings UI. The tested r
 
 No reboot was performed to validate persistence. Do not apply the Xiaomi/Mika recovery recommendations to Pixel without a separate decision.
 
-## Results by boundary
+## New result: securely locked coordinate control through VirtualDeviceManager
+
+On **2026-11-17**, a separate, non-root **shell UID 2000 controller** created its display while the Pixel was already securely locked and its physical panel was OFF. It used neither Shizuku nor the serving VirtualScreen MCP endpoint. This supplements the older failed coordinate test below; it does not turn that failure into a pass or repair the stock app.
+
+The decisive route, reported by the [MoonClicker author on Pixel 7a/API 37](https://github.com/kuomartin/MoonClicker/issues/124#issuecomment-6128968658) and then tested separately on this Pixel 10 Pro XL, was:
+
+1. Create an owned CompanionDeviceManager association for `com.android.shell` with profile `android.app.role.COMPANION_DEVICE_APP_STREAMING`.
+2. Create a `VirtualDevice` from that association, using `VirtualDeviceParams.LOCK_STATE_ALWAYS_UNLOCKED` **for the virtual device only**. The physical keyguard and PIN configuration remain unchanged.
+3. Create a trusted virtual display **without `OWN_DISPLAY_GROUP`**. On this tested build, the linked-device path gave it an independent group greater than zero, rather than the problematic primary-group path.
+4. Reject input unless the owned display is ON, the requested package matches the session, its virtual window has focus, and the physical device remains locked, secure and OFF. Use display-local coordinate bounds, not default-display input.
+5. Verify fresh nodes and uncached images after input. An acknowledged injection alone is insufficient.
+
+This is build-sensitive platform behavior. The original [technical research](https://github.com/kuomartin/MoonClicker/blob/main/docs/research/vd-display-group-android17.md) also distinguishes display state from power-group wakefulness. Do not change global desktop flags, power policy, keyguard or framework protections to force a pass.
+
+### What actually passed
+
+| Check | Observed result |
+| --- | --- |
+| Cold create while locked | Independent virtual group, virtual ON; physical OFF, deviceLocked/deviceSecure true, global interactive false |
+| Coordinate tap | Fresh probe counter changed 0 to 1 |
+| Unicode semantic text | Vietnamese and Chinese text read back exactly |
+| Native coordinate swipe | Visible probe list changed from its initial items to later items |
+| Real app | Google Calculator displayed 7×8 and preview 56; test expression cleared back to blank, no equals/history write |
+| Idle without helper traffic | After **308.7 seconds**, virtual ON; a coordinate tap changed counter 1 to 2 while physical OFF and securely locked |
+| Negative guards | Wrong-package and out-of-bounds requests rejected; session remained usable |
+| Recreate and cleanup | Owned association/role removed, then a fresh locked session created and closed successfully |
+
+Physical state was sampled before/after operations, not continuously traced. The idle interval used saved event-file timestamps. An earlier idle attempt saw physical ON with interactive false; the strict guard rejected input and the prototype closed. It was **not** counted as an idle pass. The reason for that panel-state transition was not established.
+
+### Lifecycle and privilege restoration
+
+An APP_STREAMING association grants a **persistent companion role** to shell. Closing the virtual display alone does not restore this side effect. Record existing associations/role holders before mutation, keep an ownership receipt, close the owned device, remove only the exact owned association and verify that existing entries/roles remain intact. Association allocation counters are monotonic and were not reset.
+
+The custom controller binds package/display identity, validates helper PID, UID and process start time before signals, and handles a process exiting between identity checks. The latter race was reproduced during cleanup, fixed, then recovered through the receipt; the final create/state/close cycle exited successfully. Thirteen local controller tests passed. These private-controller tests are separate from this public documentation repository's tests. Forced-stop/KILL escalation and network-loss recovery were not live-tested.
+
+Final device checks found the original association entries, role holders and ADB settings unchanged, with owned displays, worker, forward and temporary DEX removed. No root, automatic wireless activation, global wake call, app restart, message send or keyguard change was used. The observed transport was existing wireless ADB; a reported USB attachment did not establish USB transport.
+
+**Delivery boundary:** a standalone controller proof, not a distributed app patch, serving-MCP integration or model-autonomous AI task. Long/overnight idle, reboot, roaming, IME/Back, protected-content capture and arbitrary apps remain unverified. Source and raw private captures are not redistributed here.
+
+## Historical VirtualScreen results by boundary
 
 | Boundary | Observed result | Important limit |
 | --- | --- | --- |
 | Unlocked serving MCP | Live nodes/capture, coordinate counter tap and text input passed on a probe | Not all apps or gestures |
 | Locked, stock virtual display | Virtual display followed the physical display OFF; black/pending capture or unavailable nodes | Requested own-group flags did not establish an independent power group on this device |
 | Locked, experimental per-display power override | Serving MCP semantic click and semantic set-text passed on a probe; physical display OFF, secure device/keyguard locked before and after | Conditional workaround, not a stock-app fix; not a locked WhatsApp test |
-| Locked coordinate tap | RPC acknowledged the call, but the counter did not change: **FAIL** | An acknowledgement is not input-effect proof |
+| Locked coordinate tap through the older power-override route | RPC acknowledged the call, but the counter did not change: **FAIL** | An acknowledgement is not input-effect proof |
 | Capture after power-policy reset | An old frame could be returned while fresh nodes were unavailable | A screenshot alone can be stale |
 | Human/agent parallel use while unlocked | User-approved background WhatsApp task was moved to a virtual display; live conversation reading and a separately authorized message send worked | Same app data/account, not an isolated messaging instance |
 | Delivery and cleanup | Fresh UI showed Delivered; WhatsApp returned to display 0 as not visible; owned display, lease and forward were removed | Delivered is not Read; cleanup does not retract a sent message |
 | Main-display continuity | TikTok remained the physical foreground at sampled checks, with user-driven activity changes in its task | No continuous frame-level proof against every transient focus change |
 
-Long idle, roaming, reboot recovery, arbitrary third-party apps while locked, and both parties simultaneously operating the same app/task remain **untested**. A model-autonomous AI workflow was not evaluated.
+For the historical VirtualScreen route, long idle, roaming, reboot recovery, arbitrary third-party apps while locked, and both parties simultaneously operating the same app/task remain **untested**. The separate 2026-11-17 controller result above covers a bounded 308.7-second idle and Calculator, not those broader guarantees. A model-autonomous AI workflow was not evaluated.
 
 ## Conditional locked-screen power workaround
 
@@ -82,7 +121,7 @@ The framework still adjusts focus after reparenting. `onTop=false` is not a univ
 
 Primary source: [IActivityTaskManager](https://android.googlesource.com/platform/frameworks/base/+/94b4c163b7dfe5ce3607f7bb8456f9573f7de57d/core/java/android/app/IActivityTaskManager.aidl), [ActivityTaskManagerService](https://android.googlesource.com/platform/frameworks/base/+/94b4c163b7dfe5ce3607f7bb8456f9573f7de57d/services/core/java/com/android/server/wm/ActivityTaskManagerService.java), [RootWindowContainer](https://android.googlesource.com/platform/frameworks/base/+/94b4c163b7dfe5ce3607f7bb8456f9573f7de57d/services/core/java/com/android/server/wm/RootWindowContainer.java), [Task](https://android.googlesource.com/platform/frameworks/base/+/94b4c163b7dfe5ce3607f7bb8456f9573f7de57d/services/core/java/com/android/server/wm/Task.java).
 
-## Session checklist for Codex, Claude or another operator
+## Historical serving-MCP session checklist for Codex, Claude or another operator
 
 1. Enumerate devices, verify model and choose an explicit serial. Recheck all process, task, display and session IDs; old examples and temporary helpers may be stale.
 2. Reuse the authorized transport without changing wireless settings. Inspect an existing forward before creating a new one with `--no-rebind`.

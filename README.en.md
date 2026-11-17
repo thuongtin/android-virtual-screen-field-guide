@@ -14,7 +14,9 @@ A separate controller bootstrapped as root UID0, then ran its helper as system U
 
 ## Pixel 10 Pro XL / Android 17 update
 
-Non-root VirtualScreen + Shizuku shell passed locked/off semantic probe click/set-text with an experimental per-display power override; locked coordinate taps still FAILED. An unlocked, authorized WhatsApp read/send session ran on a virtual display while TikTok stayed physical foreground at sampled checks, followed by background-task restoration. No automatic Wireless debugging enablement; no universal app or transient-focus guarantee.
+New on 2026-11-17: a custom controller using CompanionDeviceManager (CDM) `APP_STREAMING` + `VirtualDeviceManager`, non-root shell UID `2000`, and no `OWN_DISPLAY_GROUP` flag passed coordinate taps, native swipe, Unicode input and Calculator result 56 while securely locked with the physical display `OFF`. After 308.7 seconds idle without helper calls, a coordinate tap still changed the counter `1 → 2`; physical state was sampled, not continuously monitored. This is not stock MCP/Shizuku integration and did not automatically enable Wireless debugging. Cleanup restored associations/roles and settings and removed session-owned resources.
+
+The historical result remains: VirtualScreen + Shizuku shell passed locked/off semantic click/set-text through an experimental per-display power override, but coordinate taps FAILED in that test. The authorized WhatsApp read/send session was tested only while unlocked, on a virtual display while TikTok remained physical foreground at sampled checks, then WhatsApp was restored to background. Neither locked WhatsApp support, universal app support, absence of transient focus changes nor reboot/network-loss recovery is established.
 
 [Pixel workflow and evidence boundaries (English)](docs/pixel-android17.md)
 
